@@ -1,0 +1,40 @@
+@startuml
+
+class Board {
+- Map<Position, Block> blocks;
+- Map<Position, Objective> objectives;
+- Map<Position, Laser> lasers;
+- int row;
+- int column;
+-moveBlock(Position from, Position to)
+-moveLaser(Position from, Position to)
+}
+
+class Objective {
+    - Position position;
+    + getPosition()
+}
+
+class Laser {
+    - Direction direction;
+    + setDirection(Direction direction)
+}
+
+interface Block {
+    + BlockType getType()
+    + void applyEffect()
+}
+
+Board o-- Objective
+Board o-- Laser
+Board o-- Block
+
+MirrorBlock ..|> Block
+CrystalBlock ..|> Block
+EmptyBlock ..|> Block
+GlassBlock ..|> Block
+MobileOpaqueBlock ..|> Block
+FixedOpaqueBlock ..|> Block
+NotBlock ..|> Block
+
+@enduml
