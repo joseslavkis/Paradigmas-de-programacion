@@ -1,4 +1,4 @@
-# Algo3
+# Paradigmas de la Programación - Corsi/Essaya
 
 ## Integrantes:
 
