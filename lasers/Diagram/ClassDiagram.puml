@@ -1,5 +1,17 @@
 @startuml
 
+class Position {
+    - int row
+    - int column
+}
+
+enum Direction {
+    SOUTH_EAST
+    SOUTH_WEST
+    NORTH_EAST
+    NORTH_WEST
+}
+
 class Board {
 - Map<Position, Block> blocks;
 - Map<Position, Objective> objectives;
@@ -28,6 +40,7 @@ interface Block {
 Board o-- Objective
 Board o-- Laser
 Board o-- Block
+Board <-- Position
 
 MirrorBlock ..|> Block
 CrystalBlock ..|> Block
@@ -36,5 +49,10 @@ GlassBlock ..|> Block
 MobileOpaqueBlock ..|> Block
 FixedOpaqueBlock ..|> Block
 NotBlock ..|> Block
+
+Position <-- Laser
+Position <-- Objective
+
+Direction <-- Laser
 
 @enduml
