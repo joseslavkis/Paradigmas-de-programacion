@@ -29,13 +29,21 @@ class Objective {
 
 class Laser {
     - Direction direction;
-    + setDirection(Direction direction)
+    + getDirection(Direction direction)
+}
+
+class DisplacementAppiler {
+    - Map<Direction, Position> mapDisplacement
+    + Position getDisplacement(Direction direction)
+    + Position applyDisplacement(Position from, Position delta)
 }
 
 interface Block {
     + BlockType getType()
     + void applyEffect()
 }
+
+
 
 Board o-- Objective
 Board o-- Laser
@@ -54,5 +62,15 @@ Position <-- Laser
 Position <-- Objective
 
 Direction <-- Laser
+
+Laser --> Block
+
+MirrorBlock --> DisplacementAppiler
+CrystalBlock --> DisplacementAppiler
+EmptyBlock --> DisplacementAppiler
+GlassBlock --> DisplacementAppiler
+MobileOpaqueBlock --> DisplacementAppiler
+FixedOpaqueBlock --> DisplacementAppiler
+NotBlock --> DisplacementAppiler
 
 @enduml

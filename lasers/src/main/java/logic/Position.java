@@ -1,14 +1,21 @@
 package logic;
-
 import java.util.Objects;
 
 public class Position {
     private final int row;
     private final int column;
 
-    public Position(int column, int row) {
+    public Position(int row, int column) {
         this.column = column;
         this.row = row;
+    }
+
+    public int getRow() {
+        return row;
+    }
+
+    public int getColumn() {
+        return column;
     }
 
     @Override

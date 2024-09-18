@@ -1,6 +1,9 @@
 package logic.blocks;
 
+import logic.Laser;
+import logic.Position;
+
 public interface Block{
-    void applyEffect();
+    Laser applyEffect(Laser laser, Position position);
     BlockType getType();
 }
