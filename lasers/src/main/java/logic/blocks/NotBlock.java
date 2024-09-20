@@ -1,14 +1,17 @@
 package logic.blocks;
 
+import logic.Laser;
+import logic.Position;
+
 public class NotBlock implements Block {
-    @Override
-    public void applyEffect() {
-
-    }
-
     @Override
     public BlockType getType() {
         return BlockType.NOT_BLOCK;
+    }
 
+    @Override
+    public Laser applyEffect(Laser laser, Position position) {
+        // Devuelve el láser siguiendo su camino (puedes ajustar esto según la lógica de tu aplicación)
+        return new NotBlock().applyEffect(laser, position);
     }
 }

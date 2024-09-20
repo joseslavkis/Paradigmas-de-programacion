@@ -18,6 +18,25 @@ public class Position {
         return column;
     }
 
+    public boolean isEvenAndOdd() {
+        return column % 2 == 0 && row % 2 != 0;
+    }
+
+    public Position getBorder(Position currentPos, String border) {
+        switch (border) {
+            case "upper":
+                return new Position(currentPos.getRow() - 1, currentPos.getColumn());
+            case "lower":
+                return new Position(currentPos.getRow() + 1, currentPos.getColumn());
+            case "left":
+                return new Position(currentPos.getRow(), currentPos.getColumn() + 1);
+            case "right":
+                return new Position(currentPos.getRow(), currentPos.getColumn() - 1);
+            default:
+                throw new RuntimeException("Unknown border");
+        }
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -25,7 +44,6 @@ public class Position {
         Position position = (Position) o;
         return row == position.row && column == position.column;
     }
-
     @Override
     public int hashCode() {
         return Objects.hash(row, column);

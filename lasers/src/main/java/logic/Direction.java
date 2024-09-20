@@ -1,9 +1,8 @@
 package logic;
 
 public enum Direction {
-    SOUTH_EAST,
-    SOUTH_WEST,
-    NORTH_EAST,
-    NORTH_WEST;
-
+    SE,
+    SW,
+    NE,
+    NW;
 }
