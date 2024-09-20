@@ -6,8 +6,8 @@ import logic.Position;
 public class FixedOpaqueBlock implements Block {
 
     @Override
-    public Laser applyEffect(Laser laser, Position position) {
-        return laser;
+    public Laser applyEffect(Laser laser, Position position, Side side) {
+        return null;
     }
 
     @Override

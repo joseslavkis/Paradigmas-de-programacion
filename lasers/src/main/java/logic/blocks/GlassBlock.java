@@ -5,8 +5,8 @@ import logic.Position;
 
 public class GlassBlock implements Block {
     @Override
-    public Laser applyEffect(Laser laser, Position position) {
-        return laser;
+    public Laser applyEffect(Laser laser, Position position, Side side) {
+        return new MirrorBlock().applyEffect(laser, position, side);
     }
 
     @Override

@@ -53,7 +53,7 @@ public class Board implements Observable<String> {
 
     }
 
-    public void moveLaser() {
+    public void moveLaser() throws Exception {
         for (Map.Entry<Position, Laser> positionLaserEntry : lasers.entrySet()) {
             Laser currentLaser = positionLaserEntry.getValue();
             Position currentLaserPosition = positionLaserEntry.getKey();
@@ -83,15 +83,25 @@ public class Board implements Observable<String> {
             Block currentBlock = blocks.get(currentBlockPosition);
 
             switch (currentBlock.getType()) {
-                case CRYSTAL:
+                case GLASS:
                     Block emptyBlock = new EmptyBlock();
-                    Laser laser1 = emptyBlock.applyEffect(newLaser, newLaser.getPosition());
-                    Laser laser2 = currentBlock.applyEffect(newLaser, newLaser.getPosition());
+                    Laser laser1 = emptyBlock.applyEffect(newLaser, newLaser.getPosition(), blockSide);
+                    Laser laser2 = currentBlock.applyEffect(newLaser, newLaser.getPosition(), blockSide);
                     lasers.put(laser1.getPosition(), laser1);
                     lasers.put(laser2.getPosition(), laser2);
                     break;
+
+                case CRYSTAL:
+                    Laser laserExited = currentBlock.applyEffect(newLaser, newLaser.getPosition(), blockSide);
+                    lasers.put(laserExited.getPosition(), laserExited);
+
+                    Direction newDirection = applier.getCrystalDirection(blockSide);
+                    newLaser.setDirection(newDirection);
+                    lasers.put(newLaser.getPosition(), newLaser);
+
                 default:
-                    Laser finalLaser = currentBlock.applyEffect(newLaser, newLaser.getPosition());
+                    Laser finalLaser = currentBlock.applyEffect(newLaser, newLaser.getPosition(), blockSide);
+                    if (finalLaser == null) return;
                     lasers.put(finalLaser.getPosition(), finalLaser);
                     break;
             }

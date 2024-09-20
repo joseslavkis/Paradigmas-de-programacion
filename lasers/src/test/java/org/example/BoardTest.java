@@ -25,7 +25,7 @@ public class BoardTest {
     }
 
     @Test
-    public void testMoveLaser() {
+    public void testMoveLaser() throws Exception {
         Map<Position, Block> blocks = new HashMap<>();
         blocks.put(new Position(1, 3), new MirrorBlock());
 
