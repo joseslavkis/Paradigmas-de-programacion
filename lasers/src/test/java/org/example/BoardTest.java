@@ -36,7 +36,9 @@ public class BoardTest {
         board.moveLaser();
 
         // Verificar que el láser se haya movido correctamente
-        Assert.assertTrue(board.getLasers().containsKey(new Position(1, 3)));
+        Assert.assertTrue(board.getLasers().containsKey(new Position(1, 2)));
+        Assert.assertEquals("SW", board.getLasers().get(new Position(1, 2)).getDirection());
+
     }
 
     @Test

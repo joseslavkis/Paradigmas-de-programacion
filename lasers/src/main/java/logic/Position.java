@@ -1,5 +1,6 @@
 package logic;
 import java.util.Objects;
+import logic.blocks.Side;
 
 public class Position {
     private final int row;
@@ -22,15 +23,15 @@ public class Position {
         return column % 2 == 0 && row % 2 != 0;
     }
 
-    public Position getBorder(Position currentPos, String border) {
+    public Position getBorder(Position currentPos, Side border) {
         switch (border) {
-            case "upper":
+            case UPPER:
                 return new Position(currentPos.getRow() - 1, currentPos.getColumn());
-            case "lower":
+            case LOWER:
                 return new Position(currentPos.getRow() + 1, currentPos.getColumn());
-            case "left":
+            case LEFT:
                 return new Position(currentPos.getRow(), currentPos.getColumn() + 1);
-            case "right":
+            case RIGHT:
                 return new Position(currentPos.getRow(), currentPos.getColumn() - 1);
             default:
                 throw new RuntimeException("Unknown border");

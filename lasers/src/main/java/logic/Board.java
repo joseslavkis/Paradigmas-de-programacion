@@ -3,6 +3,7 @@ package logic;
 import logic.blocks.Block;
 import logic.blocks.BlockType;
 import logic.blocks.EmptyBlock;
+import logic.blocks.Side;
 import org.example.Listener;
 import org.example.Observable;
 
@@ -57,26 +58,41 @@ public class Board implements Observable<String> {
             Laser currentLaser = positionLaserEntry.getValue();
             Position currentLaserPosition = positionLaserEntry.getKey();
 
-            // This works with the current address and position determines which block side the laser hits.
-            String blockSide = currentLaser.defineBlock();
-            if (blockSide.equals("Error")) throw new RuntimeException("Unknown position");
+            Map<Direction, Position> positionMap = Map.of(
+                    Direction.SE, new Position(1, 1),
+                    Direction.SW, new Position(1, -1),
+                    Direction.NE, new Position(-1, 1),
+                    Direction.NW, new Position(-1, -1)
+            );
 
+
+            DisplacementApplier applier = new DisplacementApplier(positionMap);
+            Position delta = applier.getDisplacement(currentLaser.getDirection());
+            Position newPosition = applier.applyDisplacement(currentLaserPosition, delta);
+
+            Laser newLaser = new Laser(currentLaser.getDirection(), newPosition);
+
+            // This works with the current address and position determines which block side the laser hits.
+            Side blockSide = currentLaser.defineBlock();
+            if (blockSide == null) {
+                return;
+            }
             // This function with the current position and the side of the block determines what type
             // of block the laser hits.
-            Position currentBlockPosition = currentLaserPosition.getBorder(currentLaserPosition, blockSide);
+            Position currentBlockPosition = currentLaserPosition.getBorder(newLaser.getPosition(), blockSide);
             Block currentBlock = blocks.get(currentBlockPosition);
 
             switch (currentBlock.getType()) {
                 case CRYSTAL:
                     Block emptyBlock = new EmptyBlock();
-                    Laser laser1 = emptyBlock.applyEffect(currentLaser, currentLaserPosition);
-                    Laser laser2 = currentBlock.applyEffect(currentLaser, currentLaserPosition);
+                    Laser laser1 = emptyBlock.applyEffect(newLaser, newLaser.getPosition());
+                    Laser laser2 = currentBlock.applyEffect(newLaser, newLaser.getPosition());
                     lasers.put(laser1.getPosition(), laser1);
                     lasers.put(laser2.getPosition(), laser2);
                     break;
                 default:
-                    Laser newLaser = currentBlock.applyEffect(currentLaser, currentLaserPosition);
-                    lasers.put(newLaser.getPosition(), newLaser);
+                    Laser finalLaser = currentBlock.applyEffect(newLaser, newLaser.getPosition());
+                    lasers.put(finalLaser.getPosition(), finalLaser);
                     break;
             }
         }

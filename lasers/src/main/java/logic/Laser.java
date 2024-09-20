@@ -1,7 +1,7 @@
 package logic;
 
 import java.util.Map;
-
+import logic.blocks.Side;
 
 public class Laser {
     private Direction direction;
@@ -16,28 +16,27 @@ public class Laser {
         this.direction = direction;
     }
 
-    // This method defines the block in which the laser collides by positioning and addressing.
-    public String defineBlock() {
+    public Side defineBlock() throws Exception {
         if (position.isEvenAndOdd()) {
-            Map<Direction, String> evenAndOdd = Map.of(
-                    Direction.SE, "upper",
-                    Direction.SW, "upper",
-                    Direction.NE, "lower",
-                    Direction.NW, "lower"
+            Map<Direction, Side> evenAndOdd = Map.of(
+                    Direction.SE, Side.UPPER,
+                    Direction.SW, Side.UPPER,
+                    Direction.NE, Side.LOWER,
+                    Direction.NW, Side.LOWER
             );
             return evenAndOdd.get(direction);
 
         } else if (!position.isEvenAndOdd()) {
-            Map<Direction, String> oddAndEven = Map.of(
-                    Direction.SE, "left",
-                    Direction.SW, "right",
-                    Direction.NE, "left",
-                    Direction.NW, "right"
+            Map<Direction, Side> oddAndEven = Map.of(
+                    Direction.SE, Side.LEFT,
+                    Direction.SW, Side.RIGHT,
+                    Direction.NE, Side.LEFT,
+                    Direction.NW, Side.RIGHT
             );
             return oddAndEven.get(direction);
 
         }
-        return "Error";
+        return null;
     }
 
     public Direction getDirection() {
