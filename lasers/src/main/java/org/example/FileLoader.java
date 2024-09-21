@@ -70,8 +70,8 @@ public class FileLoader {
                     String[] parts = line.split(" ");
                     if (parts.length == 4) {
                         try {
-                            int row = Integer.parseInt(parts[1]);
-                            int col = Integer.parseInt(parts[2]);
+                            int row = Integer.parseInt(parts[2]);
+                            int col = Integer.parseInt(parts[1]);
                             Direction direction = Direction.valueOf(parts[3]);
                             Position center = new Position(row, col);
                             Laser laser = new Laser(direction);
@@ -97,8 +97,8 @@ public class FileLoader {
                     String[] parts = line.split(" ");
                     if (parts.length == 3) {
                         try {
-                            int row = Integer.parseInt(parts[1]);
-                            int col = Integer.parseInt(parts[2]);
+                            int row = Integer.parseInt(parts[2]);
+                            int col = Integer.parseInt(parts[1]);
                             Position position = new Position(row, col);
                             Objective objective = new Objective(position);
                             objectives.put(position, objective);

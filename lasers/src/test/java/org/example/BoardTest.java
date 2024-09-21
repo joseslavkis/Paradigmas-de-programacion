@@ -72,10 +72,19 @@ public class BoardTest {
 
         Board board = new Board(9, 9, blocks, objectives, lasers);
 
-        // Verificar que los bloques, láseres y objetivos se cargaron correctamente
-        Assert.assertTrue(board.getBlocks().get(new Position(1, 1)) instanceof EmptyBlock);
-        Assert.assertTrue(board.getLasers().get(new Position(5, 2)) != null);
-        Assert.assertTrue(board.getObjectives().get(new Position(3, 6)) != null);
+        // Verificar que los bloques, láseres y objetivos se cargaron correctamente.
+        Assert.assertTrue(board.getBlocks().get(new Position(1, 1)) instanceof NotBlock);
+        Assert.assertNotNull(board.getLasers().get(new Position(2, 5)));
+        Assert.assertNotNull(board.getObjectives().get(new Position(6, 3)));
+        Assert.assertNotNull(board.getObjectives().get(new Position(8, 7)));
+
+        board.moveAllLaser();
+
+        Assert.assertEquals(Direction.SW, board.getLasers().get(new Position(2, 5)).getDirection());
+        Assert.assertEquals(Direction.W, board.getLasers().get(new Position(3, 4)).getDirection());
+        Assert.assertEquals(Direction.SW, board.getLasers().get(new Position(3, 2)).getDirection());
+
+
     }
 
     @Test
@@ -91,5 +100,7 @@ public class BoardTest {
         Assert.assertTrue(board.getBlocks().get(new Position(1, 1)) instanceof MirrorBlock);
         Assert.assertTrue(board.getLasers().get(new Position(0, 3)) != null);
         Assert.assertTrue(board.getObjectives().get(new Position(1, 6)) != null);
+
+
     }
 }
