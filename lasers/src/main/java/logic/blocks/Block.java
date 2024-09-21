@@ -2,9 +2,10 @@ package logic.blocks;
 
 import logic.Direction;
 import logic.Laser;
+import logic.Pair;
 import logic.Position;
 
 public interface Block {
-    Laser applyEffect(Laser laser, Position position, Side side);
+    Pair applyEffect(Laser laser, Position position, Side side);
     BlockType getType();
 }

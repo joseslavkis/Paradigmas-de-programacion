@@ -1,12 +1,13 @@
 package logic.blocks;
 
 import logic.Laser;
+import logic.Pair;
 import logic.Position;
 
 public class FixedOpaqueBlock implements Block {
 
     @Override
-    public Laser applyEffect(Laser laser, Position position, Side side) {
+    public Pair applyEffect(Laser laser, Position position, Side side) {
         return null;
     }
 

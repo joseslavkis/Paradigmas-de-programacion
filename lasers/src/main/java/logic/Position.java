@@ -20,15 +20,15 @@ public class Position {
     }
 
     public boolean isEvenAndOdd() {
-        return column % 2 == 0 && row % 2 != 0;
+        return row % 2 == 0 && column % 2 != 0;
     }
 
     public Position getBorder(Position currentPos, Side border) {
         switch (border) {
             case UPPER:
-                return new Position(currentPos.getRow() - 1, currentPos.getColumn());
-            case LOWER:
                 return new Position(currentPos.getRow() + 1, currentPos.getColumn());
+            case LOWER:
+                return new Position(currentPos.getRow() - 1, currentPos.getColumn());
             case LEFT:
                 return new Position(currentPos.getRow(), currentPos.getColumn() + 1);
             case RIGHT:

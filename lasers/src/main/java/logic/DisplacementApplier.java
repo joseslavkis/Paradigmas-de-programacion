@@ -1,7 +1,6 @@
 package logic;
 
 import logic.blocks.Side;
-
 import java.util.Map;
 
 public class DisplacementApplier {

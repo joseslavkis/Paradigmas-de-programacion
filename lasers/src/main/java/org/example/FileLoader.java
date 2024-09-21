@@ -74,7 +74,7 @@ public class FileLoader {
                             int col = Integer.parseInt(parts[2]);
                             Direction direction = Direction.valueOf(parts[3]);
                             Position center = new Position(row, col);
-                            Laser laser = new Laser(direction, center);
+                            Laser laser = new Laser(direction);
                             lasers.put(center, laser);
                         } catch (IllegalArgumentException e) {
                             System.err.println("Invalid laser line: " + line);

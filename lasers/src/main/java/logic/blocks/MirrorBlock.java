@@ -2,12 +2,13 @@ package logic.blocks;
 
 import logic.Direction;
 import logic.Laser;
+import logic.Pair;
 import logic.Position;
 import java.util.Map;
 
 public class MirrorBlock implements Block {
     @Override
-    public Laser applyEffect(Laser laser, Position position, Side side) {
+    public Pair applyEffect(Laser laser, Position position, Side side) {
         Map<Direction, Direction> directionMap;
         if (side == Side.LEFT) {
             directionMap = Map.of(
@@ -32,7 +33,7 @@ public class MirrorBlock implements Block {
         }
 
         Direction newDirection = directionMap.get(laser.getDirection());
-        return new Laser(newDirection, laser.getPosition());
+        return new Pair(position, newDirection);
     }
 
     @Override

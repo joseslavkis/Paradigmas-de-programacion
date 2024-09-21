@@ -1,15 +1,10 @@
 package logic.blocks;
-import logic.Direction;
-import logic.DisplacementApplier;
-import logic.Laser;
-import logic.Position;
-
-import java.util.Map;
+import logic.*;
 
 public class EmptyBlock implements Block {
     @Override
-    public Laser applyEffect(Laser laser, Position position, Side side) {
-        return laser;
+    public Pair applyEffect(Laser laser, Position position, Side side) {
+        return new Pair(position, laser.getDirection());
     }
 
     @Override

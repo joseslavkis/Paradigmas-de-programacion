@@ -1,23 +1,24 @@
 package logic.blocks;
 
 import logic.Laser;
+import logic.Pair;
 import logic.Position;
 
 public class CrystalBlock implements Block {
 
     @Override
-    public Laser applyEffect(Laser laser, Position position, Side side) {
+    public Pair applyEffect(Laser laser, Position position, Side side) {
         if (side == Side.LEFT) {
-            return new Laser(laser.getDirection(), new Position(position.getRow(), position.getColumn()+2));
+            return new Pair(new Position(position.getRow(), position.getColumn()+2), laser.getDirection());
 
         } else if (side == Side.LOWER) {
-            return new Laser(laser.getDirection(), new Position(position.getRow() - 2, position.getColumn()));
+            return new Pair(new Position(position.getRow() - 2, position.getColumn()), laser.getDirection());
 
         } else if (side == Side.RIGHT) {
-            return new Laser(laser.getDirection(), new Position(position.getRow(), position.getColumn()-2));
+            return new Pair(new Position(position.getRow(), position.getColumn()-2), laser.getDirection());
 
         } else {
-            return new Laser(laser.getDirection(), new Position(position.getRow() + 2, position.getColumn()));
+            return new Pair(new Position(position.getRow() + 2, position.getColumn()), laser.getDirection());
         }
     }
 

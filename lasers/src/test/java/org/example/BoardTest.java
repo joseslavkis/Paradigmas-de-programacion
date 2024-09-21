@@ -25,19 +25,41 @@ public class BoardTest {
     }
 
     @Test
-    public void testMoveLaser() throws Exception {
+    public void testMoveLaserOpaqueBlocks() throws Exception {
         Map<Position, Block> blocks = new HashMap<>();
-        blocks.put(new Position(1, 3), new MirrorBlock());
+        blocks.put(new Position(1, 3), new MobileOpaqueBlock());
 
         Map<Position, Laser> lasers = new HashMap<>();
-        lasers.put(new Position(0, 1), new Laser(Direction.SE, new Position(0, 1)));
+        lasers.put(new Position(0, 1), new Laser(Direction.SE));
 
         Board board = new Board(5, 5, blocks, new HashMap<>(), lasers);
-        board.moveLaser();
+        board.moveAllLaser();
+
+        // Verificar que el láser se haya movido correctamente
+        Assert.assertFalse(board.getLasers().containsKey(new Position(1, 2)));
+        Assert.assertEquals(1, board.getLasers().size());
+    }
+
+    public void testMoveLaser() throws Exception {
+        Map<Position, Block> blocks = new HashMap<>();
+        blocks.put(new Position(1, 3), new EmptyBlock());
+        blocks.put(new Position(3, 3), new CrystalBlock());
+        blocks.put(new Position(5, 5), new MirrorBlock());
+
+        Map<Position, Laser> lasers = new HashMap<>();
+        lasers.put(new Position(0, 1), new Laser(Direction.SE));
+
+        Board board = new Board(5, 5, blocks, new HashMap<>(), lasers);
+        board.moveAllLaser();
+        board.moveAllLaser();
+        board.moveAllLaser();
 
         // Verificar que el láser se haya movido correctamente
         Assert.assertTrue(board.getLasers().containsKey(new Position(1, 2)));
-        Assert.assertEquals("SW", board.getLasers().get(new Position(1, 2)).getDirection());
+        Assert.assertEquals(Direction.SE, board.getLasers().get(new Position(1, 2)).getDirection());
+        Assert.assertEquals(Direction.S, board.getLasers().get(new Position(2, 3)).getDirection());
+        Assert.assertEquals(Direction.SE, board.getLasers().get(new Position(4, 3)).getDirection());
+        Assert.assertEquals(Direction.SW, board.getLasers().get(new Position(5, 4)).getDirection());
 
     }
 

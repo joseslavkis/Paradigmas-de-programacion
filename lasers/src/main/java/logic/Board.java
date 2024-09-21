@@ -8,6 +8,7 @@ import org.example.Listener;
 import org.example.Observable;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -26,17 +27,19 @@ public class Board implements Observable<String> {
         this.column = column;
         this.lasers = laser;
     }
+
     public Map<Position, Objective> getObjectives() {
         return objectives;
     }
+
     public Map<Position, Laser> getLasers() {
         return lasers;
     }
-    @Override
-    public void addListener(Listener<String> listener){
-        listeners.add(listener);
-    };
 
+    @Override
+    public void addListener(Listener<String> listener) {
+        listeners.add(listener);
+    }
 
     public void moveBlock(Position from, Position to) {
         Block block1 = blocks.get(from);
@@ -53,7 +56,9 @@ public class Board implements Observable<String> {
 
     }
 
-    public void moveLaser() throws Exception {
+    public void moveAllLaser() {
+        Map<Position, Laser> auxMap = new HashMap<>();
+
         for (Map.Entry<Position, Laser> positionLaserEntry : lasers.entrySet()) {
             Laser currentLaser = positionLaserEntry.getValue();
             Position currentLaserPosition = positionLaserEntry.getKey();
@@ -62,50 +67,66 @@ public class Board implements Observable<String> {
                     Direction.SE, new Position(1, 1),
                     Direction.SW, new Position(1, -1),
                     Direction.NE, new Position(-1, 1),
-                    Direction.NW, new Position(-1, -1)
+                    Direction.NW, new Position(-1, -1),
+                    Direction.S, new Position(2, 0),
+                    Direction.N, new Position(-2, 0),
+                    Direction.E, new Position(0, 2),
+                    Direction.W, new Position(0, -2)
             );
-
 
             DisplacementApplier applier = new DisplacementApplier(positionMap);
             Position delta = applier.getDisplacement(currentLaser.getDirection());
             Position newPosition = applier.applyDisplacement(currentLaserPosition, delta);
 
-            Laser newLaser = new Laser(currentLaser.getDirection(), newPosition);
+            Laser newLaser = new Laser(currentLaser.getDirection());
 
             // This works with the current address and position determines which block side the laser hits.
-            Side blockSide = currentLaser.defineBlock();
+            Side blockSide = currentLaser.getBlockSide(currentLaserPosition);
             if (blockSide == null) {
                 return;
             }
             // This function with the current position and the side of the block determines what type
             // of block the laser hits.
-            Position currentBlockPosition = currentLaserPosition.getBorder(newLaser.getPosition(), blockSide);
+            Position currentBlockPosition = currentLaserPosition.getBorder(newPosition, blockSide);
             Block currentBlock = blocks.get(currentBlockPosition);
 
             switch (currentBlock.getType()) {
                 case GLASS:
                     Block emptyBlock = new EmptyBlock();
-                    Laser laser1 = emptyBlock.applyEffect(newLaser, newLaser.getPosition(), blockSide);
-                    Laser laser2 = currentBlock.applyEffect(newLaser, newLaser.getPosition(), blockSide);
-                    lasers.put(laser1.getPosition(), laser1);
-                    lasers.put(laser2.getPosition(), laser2);
+                    Pair pair1 = emptyBlock.applyEffect(newLaser, newPosition, blockSide);
+                    Pair pair2 = currentBlock.applyEffect(newLaser, newPosition, blockSide);
+                    Laser laser1 = new Laser(pair1.getDirection());
+                    Laser laser2 = new Laser(pair2.getDirection());
+
+                    auxMap.put(pair1.getPosition(), laser1);
+                    if (auxMap.containsKey(pair2.getPosition())) continue;
+                    auxMap.put(pair2.getPosition(), laser2);
                     break;
 
                 case CRYSTAL:
-                    Laser laserExited = currentBlock.applyEffect(newLaser, newLaser.getPosition(), blockSide);
-                    lasers.put(laserExited.getPosition(), laserExited);
+                    Pair PairExited = currentBlock.applyEffect(newLaser, newPosition, blockSide);
+                    Laser laserExited = new Laser(PairExited.getDirection());
+                    Direction directionExited = laserExited.getDirection();
 
                     Direction newDirection = applier.getCrystalDirection(blockSide);
                     newLaser.setDirection(newDirection);
-                    lasers.put(newLaser.getPosition(), newLaser);
+
+                    auxMap.put(PairExited.getPosition(), laserExited);
+                    if (auxMap.containsKey(newPosition)) continue; // Verifico si ya esta puesto este lado ( puede ser que al hacer el recorrido repita este punto pq es un "punto doble" )
+                    auxMap.put(newPosition, newLaser);
+                    break;
 
                 default:
-                    Laser finalLaser = currentBlock.applyEffect(newLaser, newLaser.getPosition(), blockSide);
-                    if (finalLaser == null) return;
-                    lasers.put(finalLaser.getPosition(), finalLaser);
+                    Pair finalPair = currentBlock.applyEffect(newLaser, newPosition, blockSide);
+                    if (finalPair == null) return;
+                    Laser finalLaser = new Laser(finalPair.getDirection());
+                    auxMap.put(finalPair.getPosition(), finalLaser);
                     break;
             }
         }
+
+        lasers.putAll(auxMap);
+
     }
 
     public Map<Position, Block> getBlocks() {
