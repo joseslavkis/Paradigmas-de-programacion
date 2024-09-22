@@ -1,9 +1,6 @@
 package org.example;
 
-import logic.Direction;
-import logic.Objective;
-import logic.Position;
-import logic.Laser;
+import logic.*;
 import logic.blocks.*;
 
 import java.io.BufferedReader;
@@ -61,8 +58,8 @@ public class FileLoader {
         return blocks;
     }
 
-    public Map<Position, Laser> loadLasers(String filePath) throws IOException {
-        Map<Position, Laser> lasers = new HashMap<>();
+    public Map<Pair, Laser> loadLasers(String filePath) throws IOException {
+        Map<Pair, Laser> lasers = new HashMap<>();
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
             String line;
             while ((line = reader.readLine()) != null) {
@@ -73,7 +70,7 @@ public class FileLoader {
                             int row = Integer.parseInt(parts[2]);
                             int col = Integer.parseInt(parts[1]);
                             Direction direction = Direction.valueOf(parts[3]);
-                            Position center = new Position(row, col);
+                            Pair center = new Pair(new Position(row, col), direction);
                             Laser laser = new Laser(direction);
                             lasers.put(center, laser);
                         } catch (IllegalArgumentException e) {

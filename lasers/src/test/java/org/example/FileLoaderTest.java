@@ -1,8 +1,6 @@
 package org.example;
 
-import logic.Laser;
-import logic.Objective;
-import logic.Position;
+import logic.*;
 import logic.blocks.*;
 import org.junit.Test;
 import org.junit.Assert;
@@ -34,11 +32,11 @@ public class FileLoaderTest {
     @Test
     public void testLoadLasers() throws IOException {
         FileLoader fileLoader = new FileLoader();
-        Map<Position, Laser> lasers = fileLoader.loadLasers("src/test/resources/test_level.dat");
+        Map<Pair, Laser> lasers = fileLoader.loadLasers("src/test/resources/test_level.dat");
 
         // Verificar que los láseres se cargaron correctamente
         Assert.assertEquals(1, lasers.size());
-        Assert.assertNotNull(lasers.get(new Position(0, 5)));
+        Assert.assertNotNull(lasers.get(new Pair(new Position(0, 5), Direction.SE)));
     }
 
     @Test

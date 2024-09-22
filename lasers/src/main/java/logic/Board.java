@@ -7,6 +7,7 @@ import logic.blocks.Side;
 import org.example.Listener;
 import org.example.Observable;
 
+import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -15,12 +16,12 @@ import java.util.Map;
 public class Board implements Observable<String> {
     private final Map<Position, Block> blocks;
     private final Map<Position, Objective> objectives;
-    private final Map<Position, Laser> lasers;
+    private final Map<Pair, Laser> lasers;
     private final int row;
     private final int column;
     private final List<Listener<String>> listeners = new ArrayList<>();
 
-    public Board(int row, int column, Map<Position, Block> blocks, Map<Position, Objective> objectives, Map<Position, Laser> laser) {
+    public Board(int row, int column, Map<Position, Block> blocks, Map<Position, Objective> objectives, Map<Pair, Laser> laser) {
         this.blocks = blocks;
         this.objectives = objectives;
         this.row = row;
@@ -32,7 +33,7 @@ public class Board implements Observable<String> {
         return objectives;
     }
 
-    public Map<Position, Laser> getLasers() {
+    public Map<Pair, Laser> getLasers() {
         return lasers;
     }
 
@@ -57,11 +58,11 @@ public class Board implements Observable<String> {
     }
 
     public void moveAllLaser() {
-        Map<Position, Laser> auxMap = new HashMap<>();
+        Map<Pair, Laser> auxMap = new HashMap<>();
 
-        for (Map.Entry<Position, Laser> positionLaserEntry : lasers.entrySet()) {
+        for (Map.Entry<Pair, Laser> positionLaserEntry : lasers.entrySet()) {
             Laser currentLaser = positionLaserEntry.getValue();
-            Position currentLaserPosition = positionLaserEntry.getKey();
+            Position currentLaserPosition = positionLaserEntry.getKey().getPosition();
 
             Map<Direction, Position> positionMap = Map.of(
                     Direction.SE, new Position(1, 1),
@@ -98,9 +99,9 @@ public class Board implements Observable<String> {
                     Laser laser1 = new Laser(pair1.getDirection());
                     Laser laser2 = new Laser(pair2.getDirection());
 
-                    auxMap.put(pair1.getPosition(), laser1);
-                    if (auxMap.containsKey(pair2.getPosition())) continue;
-                    auxMap.put(pair2.getPosition(), laser2);
+                    auxMap.put(pair1, laser1);
+                    if (auxMap.containsKey(pair2)) continue;
+                    auxMap.put(pair2, laser2);
                     break;
 
                 case CRYSTAL:
@@ -111,16 +112,17 @@ public class Board implements Observable<String> {
                     Direction newDirection = applier.getCrystalDirection(blockSide);
                     newLaser.setDirection(newDirection);
 
-                    auxMap.put(PairExited.getPosition(), laserExited);
-                    if (auxMap.containsKey(newPosition)) continue; // Verifico si ya esta puesto este lado ( puede ser que al hacer el recorrido repita este punto pq es un "punto doble" )
-                    auxMap.put(newPosition, newLaser);
+                    auxMap.put(PairExited, laserExited);
+                    Pair newPair = new Pair(newPosition, newDirection);
+                    if (auxMap.containsKey(newPair)) continue; // Verifico si ya esta puesto este lado ( puede ser que al hacer el recorrido repita este punto pq es un "punto doble" )
+                    auxMap.put(newPair, newLaser);
                     break;
 
                 default:
                     Pair finalPair = currentBlock.applyEffect(newLaser, newPosition, blockSide);
                     if (finalPair == null) return;
                     Laser finalLaser = new Laser(finalPair.getDirection());
-                    auxMap.put(finalPair.getPosition(), finalLaser);
+                    auxMap.put(finalPair, finalLaser);
                     break;
             }
         }

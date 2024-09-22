@@ -29,8 +29,8 @@ public class BoardTest {
         Map<Position, Block> blocks = new HashMap<>();
         blocks.put(new Position(1, 3), new MobileOpaqueBlock());
 
-        Map<Position, Laser> lasers = new HashMap<>();
-        lasers.put(new Position(0, 1), new Laser(Direction.SE));
+        Map<Pair, Laser> lasers = new HashMap<>();
+        lasers.put(new Pair(new Position(0, 1), Direction.SE), new Laser(Direction.SE));
 
         Board board = new Board(5, 5, blocks, new HashMap<>(), lasers);
         board.moveAllLaser();
@@ -39,15 +39,15 @@ public class BoardTest {
         Assert.assertFalse(board.getLasers().containsKey(new Position(1, 2)));
         Assert.assertEquals(1, board.getLasers().size());
     }
-
+    @Test
     public void testMoveLaser() throws Exception {
         Map<Position, Block> blocks = new HashMap<>();
         blocks.put(new Position(1, 3), new EmptyBlock());
         blocks.put(new Position(3, 3), new CrystalBlock());
         blocks.put(new Position(5, 5), new MirrorBlock());
 
-        Map<Position, Laser> lasers = new HashMap<>();
-        lasers.put(new Position(0, 1), new Laser(Direction.SE));
+        Map<Pair, Laser> lasers = new HashMap<>();
+        lasers.put(new Pair(new Position(0, 1), Direction.SE), new Laser(Direction.SE));
 
         Board board = new Board(5, 5, blocks, new HashMap<>(), lasers);
         board.moveAllLaser();
@@ -67,7 +67,7 @@ public class BoardTest {
     public void testLoadBoardLevel5() throws IOException {
         FileLoader fileLoader = new FileLoader();
         Map<Position, Block> blocks = fileLoader.loadBlocks("src/test/resources/level5.dat");
-        Map<Position, Laser> lasers = fileLoader.loadLasers("src/test/resources/level5.dat");
+        Map<Pair, Laser> lasers = fileLoader.loadLasers("src/test/resources/level5.dat");
         Map<Position, Objective> objectives = fileLoader.loadObjectives("src/test/resources/level5.dat");
 
         Board board = new Board(9, 9, blocks, objectives, lasers);
@@ -90,7 +90,7 @@ public class BoardTest {
     public void testLoadBoardLevel6() throws IOException {
         FileLoader fileLoader = new FileLoader();
         Map<Position, Block> blocks = fileLoader.loadBlocks("src/test/resources/level6.dat");
-        Map<Position, Laser> lasers = fileLoader.loadLasers("src/test/resources/level6.dat");
+        Map<Pair, Laser> lasers = fileLoader.loadLasers("src/test/resources/level6.dat");
         Map<Position, Objective> objectives = fileLoader.loadObjectives("src/test/resources/level6.dat");
 
         Board board = new Board(9, 9, blocks, objectives, lasers);
