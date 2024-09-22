@@ -36,25 +36,25 @@ public class FileLoaderTest {
 
         // Verificar que los láseres se cargaron correctamente
         Assert.assertEquals(1, lasers.size());
-        Assert.assertNotNull(lasers.get(new Pair(new Position(0, 5), Direction.SE)));
+        Assert.assertEquals(Direction.SE, lasers.get(new Pair(new Position(5, 0), Direction.SE)).getDirection());
     }
 
     @Test
-    public void testLoadObjetives() throws IOException {
+    public void testLoadObjectives() throws IOException {
         FileLoader fileLoader = new FileLoader();
-        Map<Position, Objective> objetives = fileLoader.loadObjectives("src/test/resources/test_level.dat");
+        Map<Position, Objective> objectives = fileLoader.loadObjectives("src/test/resources/test_level.dat");
 
         // Verificar que los láseres se cargaron correctamente
-        Assert.assertEquals(1, objetives.size());
-        Assert.assertNotNull(objetives.get(new Position(4, 3)));
+        Assert.assertEquals(1, objectives.size());
+        Assert.assertNotNull(objectives.get(new Position(3, 4)));
 
-        Map<Position, Objective> objetives2 = fileLoader.loadObjectives("src/test/resources/level6.dat");
+        Map<Position, Objective> objectives2 = fileLoader.loadObjectives("src/test/resources/level6.dat");
 
-        Assert.assertEquals(4, objetives2.size());
-        Assert.assertNotNull(objetives2.get(new Position(1, 6)));
-        Assert.assertNotNull(objetives2.get(new Position(3, 4)));
-        Assert.assertNotNull(objetives2.get(new Position(5, 4)));
-        Assert.assertNotNull(objetives2.get(new Position(8, 5)));
+        Assert.assertEquals(4, objectives2.size());
+        Assert.assertNotNull(objectives2.get(new Position(6, 1)));
+        Assert.assertNotNull(objectives2.get(new Position(4, 3)));
+        Assert.assertNotNull(objectives2.get(new Position(4, 5)));
+        Assert.assertNotNull(objectives2.get(new Position(5, 8)));
     }
 
 }

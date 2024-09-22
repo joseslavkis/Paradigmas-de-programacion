@@ -36,9 +36,10 @@ public class BoardTest {
         board.moveAllLaser();
 
         // Verificar que el láser se haya movido correctamente
-        Assert.assertFalse(board.getLasers().containsKey(new Position(1, 2)));
+        Assert.assertFalse(board.getLasers().containsKey(new Pair(new Position(1, 2), Direction.SE)));
         Assert.assertEquals(1, board.getLasers().size());
     }
+
     @Test
     public void testMoveLaser() throws Exception {
         Map<Position, Block> blocks = new HashMap<>();
@@ -55,12 +56,10 @@ public class BoardTest {
         board.moveAllLaser();
 
         // Verificar que el láser se haya movido correctamente
-        Assert.assertTrue(board.getLasers().containsKey(new Position(1, 2)));
-        Assert.assertEquals(Direction.SE, board.getLasers().get(new Position(1, 2)).getDirection());
-        Assert.assertEquals(Direction.S, board.getLasers().get(new Position(2, 3)).getDirection());
-        Assert.assertEquals(Direction.SE, board.getLasers().get(new Position(4, 3)).getDirection());
-        Assert.assertEquals(Direction.SW, board.getLasers().get(new Position(5, 4)).getDirection());
-
+        Assert.assertEquals(Direction.SE, board.getLasers().get(new Pair(new Position(1, 2), Direction.SE)).getDirection());
+        Assert.assertEquals(Direction.S, board.getLasers().get(new Pair(new Position(2, 3), Direction.S)).getDirection());
+        Assert.assertEquals(Direction.SE, board.getLasers().get(new Pair(new Position(4, 3), Direction.SE)).getDirection());
+        Assert.assertEquals(Direction.SW, board.getLasers().get(new Pair(new Position(5, 4), Direction.SW)).getDirection());
     }
 
     @Test
@@ -70,20 +69,20 @@ public class BoardTest {
         Map<Pair, Laser> lasers = fileLoader.loadLasers("src/test/resources/level5.dat");
         Map<Position, Objective> objectives = fileLoader.loadObjectives("src/test/resources/level5.dat");
 
-        Board board = new Board(9, 9, blocks, objectives, lasers);
+        Board board = new Board(4, 4, blocks, objectives, lasers);
 
         // Verificar que los bloques, láseres y objetivos se cargaron correctamente.
         Assert.assertTrue(board.getBlocks().get(new Position(1, 1)) instanceof NotBlock);
-        Assert.assertNotNull(board.getLasers().get(new Position(2, 5)));
+        Assert.assertNotNull(board.getLasers().get(new Pair(new Position(2, 5), Direction.SW)));
         Assert.assertNotNull(board.getObjectives().get(new Position(6, 3)));
         Assert.assertNotNull(board.getObjectives().get(new Position(8, 7)));
 
         board.moveAllLaser();
         board.moveAllLaser();
-        Assert.assertEquals(Direction.SW, board.getLasers().get(new Position(2, 5)).getDirection());
-        Assert.assertEquals(Direction.W, board.getLasers().get(new Position(3, 4)).getDirection());
-        Assert.assertEquals(Direction.SW, board.getLasers().get(new Position(3, 2)).getDirection());
-        Assert.assertEquals(Direction.SW, board.getLasers().get(new Position(4, 1)).getDirection());
+        Assert.assertEquals(Direction.SW, board.getLasers().get(new Pair(new Position(2, 5), Direction.SW)).getDirection());
+        Assert.assertEquals(Direction.W, board.getLasers().get(new Pair(new Position(3, 4), Direction.W)).getDirection());
+        Assert.assertEquals(Direction.SW, board.getLasers().get(new Pair(new Position(3, 2), Direction.SW)).getDirection());
+        Assert.assertEquals(Direction.SW, board.getLasers().get(new Pair(new Position(4, 1), Direction.SW)).getDirection());
     }
 
     @Test
@@ -93,19 +92,37 @@ public class BoardTest {
         Map<Pair, Laser> lasers = fileLoader.loadLasers("src/test/resources/level6.dat");
         Map<Position, Objective> objectives = fileLoader.loadObjectives("src/test/resources/level6.dat");
 
-        Board board = new Board(9, 9, blocks, objectives, lasers);
-        board.moveAllLaser();
-        board.moveAllLaser();
-        board.moveAllLaser();
-        board.moveAllLaser();
+        Board board = new Board(4, 4, blocks, objectives, lasers);
         // Verificar que los bloques, láseres y objetivos se cargaron correctamente
         Assert.assertTrue(board.getBlocks().get(new Position(1, 1)) instanceof MirrorBlock);
-        Assert.assertEquals(Direction.SW, board.getLasers().get(new Position(2, 7)).getDirection());
-        Assert.assertEquals(Direction.SW, board.getLasers().get(new Position(3, 6)).getDirection());
-        Assert.assertEquals(Direction.SE, board.getLasers().get(new Position(3, 0)).getDirection());
-        Assert.assertEquals(Direction.SE, board.getLasers().get(new Position(4, 1)).getDirection());
-        Assert.assertEquals(Direction.SE, board.getLasers().get(new Position(5, 2)).getDirection());
-        Assert.assertEquals(Direction.SE, board.getLasers().get(new Position(7, 4)).getDirection());
+        // Origenes
+        Assert.assertEquals(Direction.SW, board.getLasers().get(new Pair(new Position(2, 7), Direction.SW)).getDirection());
+        Assert.assertEquals(Direction.SE, board.getLasers().get(new Pair(new Position(3, 0), Direction.SE)).getDirection());
+        // Primer move lasers
+        board.moveAllLaser();
+        Assert.assertEquals(Direction.SW, board.getLasers().get(new Pair(new Position(3, 6), Direction.SW)).getDirection());
+        Assert.assertEquals(Direction.SE, board.getLasers().get(new Pair(new Position(4, 1), Direction.SE)).getDirection());
+        // Segundo move lasers
+        board.moveAllLaser();
+        Assert.assertEquals(Direction.SW, board.getLasers().get(new Pair(new Position(4, 5), Direction.SW)).getDirection());
+        Assert.assertEquals(Direction.SE, board.getLasers().get(new Pair(new Position(5, 2), Direction.SE)).getDirection());
+        // Tercer move lasers
+        board.moveAllLaser();
+        Assert.assertEquals(Direction.SW, board.getLasers().get(new Pair(new Position(5, 4), Direction.SW)).getDirection());
+        Assert.assertEquals(Direction.SE, board.getLasers().get(new Pair(new Position(6, 3), Direction.SE)).getDirection());
+        // Caso de colision con anterior y cuarto move lasers
+        board.moveAllLaser();
+        Assert.assertEquals(Direction.SW, board.getLasers().get(new Pair(new Position(6, 3), Direction.SW)).getDirection());
+        Assert.assertEquals(Direction.SE, board.getLasers().get(new Pair(new Position(7, 4), Direction.SE)).getDirection());
+        // Quintos lasers bro
+        board.moveAllLaser();
+        Assert.assertEquals(Direction.SE, board.getLasers().get(new Pair(new Position(7, 2), Direction.SE)).getDirection());
+        Assert.assertEquals(Direction.SE, board.getLasers().get(new Pair(new Position(8, 5), Direction.SE)).getDirection());
+
+        // Sexto y ultimo move lasers
+        board.moveAllLaser();
+        Assert.assertEquals(Direction.SE, board.getLasers().get(new Pair(new Position(8, 3), Direction.SE)).getDirection());
+        Assert.assertEquals(13, board.getLasers().size());
         Assert.assertTrue(board.getObjectives().get(new Position(6, 1)) != null);
     }
 }

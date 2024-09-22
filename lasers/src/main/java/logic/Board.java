@@ -59,7 +59,6 @@ public class Board implements Observable<String> {
 
     public void moveAllLaser() {
         Map<Pair, Laser> auxMap = new HashMap<>();
-
         for (Map.Entry<Pair, Laser> positionLaserEntry : lasers.entrySet()) {
             Laser currentLaser = positionLaserEntry.getValue();
             Position currentLaserPosition = positionLaserEntry.getKey().getPosition();
@@ -79,17 +78,29 @@ public class Board implements Observable<String> {
             Position delta = applier.getDisplacement(currentLaser.getDirection());
             Position newPosition = applier.applyDisplacement(currentLaserPosition, delta);
 
+            if (newPosition.getRow() < 0 || newPosition.getRow() > 2*row || newPosition.getColumn() < 0 || newPosition.getColumn() > 2*column) {
+                continue;
+            }
+
             Laser newLaser = new Laser(currentLaser.getDirection());
 
             // This works with the current address and position determines which block side the laser hits.
             Side blockSide = currentLaser.getBlockSide(currentLaserPosition);
             if (blockSide == null) {
-                return;
+                continue;
             }
+
             // This function with the current position and the side of the block determines what type
             // of block the laser hits.
             Position currentBlockPosition = currentLaserPosition.getBorder(newPosition, blockSide);
             Block currentBlock = blocks.get(currentBlockPosition);
+
+            if (currentBlock == null) {
+                Pair finalPair = new Pair( newPosition, currentLaser.getDirection());
+                Laser finalLaser = new Laser(finalPair.getDirection());
+                auxMap.put(finalPair, finalLaser);
+                continue;
+            };
 
             switch (currentBlock.getType()) {
                 case GLASS:
@@ -120,7 +131,7 @@ public class Board implements Observable<String> {
 
                 default:
                     Pair finalPair = currentBlock.applyEffect(newLaser, newPosition, blockSide);
-                    if (finalPair == null) return;
+                    if (finalPair == null) continue;
                     Laser finalLaser = new Laser(finalPair.getDirection());
                     auxMap.put(finalPair, finalLaser);
                     break;

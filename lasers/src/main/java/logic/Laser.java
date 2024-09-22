@@ -1,6 +1,8 @@
 package logic;
 
 import java.util.Map;
+import java.util.Objects;
+
 import logic.blocks.Side;
 
 public class Laser {
@@ -47,6 +49,19 @@ public class Laser {
 
     public Direction getDirection() {
         return direction;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Laser laser = (Laser) o;
+        return direction == laser.direction;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(direction);
     }
 
 }
