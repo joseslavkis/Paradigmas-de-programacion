@@ -9,8 +9,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-
-
 public class FileLoader {
     public static final char SPACE = ' ';
     public Map<Position, Block> loadBlocks(String filePath) throws IOException {
