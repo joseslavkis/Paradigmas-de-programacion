@@ -39,6 +39,7 @@ public class Board implements Observable<String> {
         this.lasers = new HashMap<>(primitiveLasers);
     }
 
+
     @Override
     public void addListener(Listener<String> listener) {
         listeners.add(listener);
@@ -64,8 +65,8 @@ public class Board implements Observable<String> {
 
         for (Map.Entry<Pair, Laser> positionLaserEntry : lasers.entrySet()) {
             Laser currentLaser = positionLaserEntry.getValue();
-            Position currentLaserPosition = positionLaserEntry.getKey().getPosition();
             if (currentLaser.getDirection() == Direction.STATIC) continue;
+            Position currentLaserPosition = positionLaserEntry.getKey().getPosition();
 
             Map<Direction, Position> movementMap = currentLaserPosition.getMovementMap();
             DisplacementApplier applier = new DisplacementApplier(movementMap);
@@ -75,56 +76,25 @@ public class Board implements Observable<String> {
 
             Laser newLaser = new Laser(currentLaser.getDirection());
 
-            // This works with the current address and position determines which block side the laser hits.
             Side blockSide = currentLaser.getBlockSide(currentLaserPosition);
-            if (blockSide == null) {
-                continue;
-            }
+            if (blockSide == null) continue;
 
-            // This function with the current position and the side of the block determines what type
-            // of block the laser hits.
             Position currentBlockPosition = currentLaserPosition.getBorder(newPosition, blockSide);
             Block currentBlock = blocks.get(currentBlockPosition);
 
-            if (currentBlock == null) {
-                Pair finalPair = new Pair( newPosition, currentLaser.getDirection());
-                Laser finalLaser = new Laser(finalPair.getDirection());
-                auxMap.put(finalPair, finalLaser);
-                continue;
-            };
+            if (isCurrentBlockNull(currentBlock, newPosition, newLaser, auxMap)) continue;
 
             switch (currentBlock.getType()) {
                 case GLASS:
-                    Block emptyBlock = new EmptyBlock();
-                    Pair pair1 = emptyBlock.applyEffect(newLaser, newPosition, blockSide);
-                    Pair pair2 = currentBlock.applyEffect(newLaser, newPosition, blockSide);
-                    Laser laser1 = new Laser(pair1.getDirection());
-                    Laser laser2 = new Laser(pair2.getDirection());
-
-                    auxMap.put(pair1, laser1);
-                    if (auxMap.containsKey(pair2)) continue;
-                    auxMap.put(pair2, laser2);
+                    applyGlassEffect(newLaser, newPosition, currentBlock, blockSide, auxMap);
                     break;
 
                 case CRYSTAL:
-                    Pair PairExited = currentBlock.applyEffect(newLaser, newPosition, blockSide);
-                    Laser laserExited = new Laser(PairExited.getDirection());
-                    Direction directionExited = laserExited.getDirection();
-
-                    Direction newDirection = applier.getCrystalDirection(blockSide);
-                    if (auxMap.containsKey(PairExited)) continue;
-                    newLaser.setDirection(newDirection);
-
-                    auxMap.put(PairExited, laserExited);
-                    Pair newPair = new Pair(newPosition, newDirection);
-                    if (auxMap.containsKey(newPair)) continue; // Verifico si ya esta puesto este lado ( puede ser que al hacer el recorrido repita este punto pq es un "punto doble" )
-                    auxMap.put(newPair, newLaser);
+                    applyCrystalEffect(applier, newLaser, newPosition, currentBlock, blockSide, auxMap);
                     break;
+
                 default:
-                    Pair finalPair = currentBlock.applyEffect(newLaser, newPosition, blockSide);
-                    if (finalPair == null) continue;
-                    Laser finalLaser = new Laser(finalPair.getDirection());
-                    auxMap.put(finalPair, finalLaser);
+                    applyGenericEffect(newLaser, newPosition, currentBlock, blockSide, auxMap);
                     break;
             }
         }
@@ -159,5 +129,46 @@ public class Board implements Observable<String> {
 
     public Map<Position, Block> getBlocks() {
         return blocks;
+    }
+
+     private boolean isCurrentBlockNull(Block currentBlock, Position newPosition, Laser newLaser, Map<Pair, Laser> auxMap) {
+        if (currentBlock == null) {
+            Pair finalPair = new Pair(newPosition, newLaser.getDirection());
+            Laser finalLaser = new Laser(finalPair.getDirection());
+            auxMap.put(finalPair, finalLaser);
+            return true;
+        }
+        return false;
+    }
+    private void applyGlassEffect(Laser newLaser, Position newPosition, Block currentBlock, Side blockSide, Map<Pair, Laser> auxMap) {
+        Block emptyBlock = new EmptyBlock();
+        Pair pair1 = emptyBlock.applyEffect(newLaser, newPosition, blockSide);
+        Pair pair2 = currentBlock.applyEffect(newLaser, newPosition, blockSide);
+        Laser laser1 = new Laser(pair1.getDirection());
+        Laser laser2 = new Laser(pair2.getDirection());
+
+        auxMap.put(pair1, laser1);
+        if (auxMap.containsKey(pair2)) return;
+        auxMap.put(pair2, laser2);
+    }
+
+    private void applyGenericEffect(Laser newLaser, Position newPosition, Block currentBlock, Side blockSide, Map<Pair, Laser> auxMap) {
+        Pair pair = currentBlock.applyEffect(newLaser, newPosition, blockSide);
+        Laser laser = new Laser(pair.getDirection());
+        auxMap.put(pair, laser);
+    }
+    private void applyCrystalEffect(DisplacementApplier applier, Laser newLaser, Position newPosition, Block currentBlock, Side blockSide, Map<Pair, Laser> auxMap) {
+        Pair pairExited = currentBlock.applyEffect(newLaser, newPosition, blockSide);
+        Laser laserExited = new Laser(pairExited.getDirection());
+        Direction directionExited = laserExited.getDirection();
+
+        Direction newDirection = applier.getCrystalDirection(blockSide);
+        if (auxMap.containsKey(pairExited)) return;
+        newLaser.setDirection(newDirection);
+
+        auxMap.put(pairExited, laserExited);
+        Pair newPair = new Pair(newPosition, newDirection);
+        if (auxMap.containsKey(newPair)) return;
+        auxMap.put(newPair, newLaser);
     }
 }
