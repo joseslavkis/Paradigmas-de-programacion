@@ -13,7 +13,7 @@ public class Board implements Observable<String> {
     private final Map<Position, Block> blocks;
     private final Map<Position, Objective> objectives;
     private Map<Pair, Laser> lasers;
-    private Map<Pair, Laser> primitiveLasers;
+    private final Map<Pair, Laser> primitiveLasers;
     private final int row;
     private final int column;
     private final List<Listener<String>> listeners = new ArrayList<>();
@@ -65,25 +65,13 @@ public class Board implements Observable<String> {
         for (Map.Entry<Pair, Laser> positionLaserEntry : lasers.entrySet()) {
             Laser currentLaser = positionLaserEntry.getValue();
             Position currentLaserPosition = positionLaserEntry.getKey().getPosition();
+            if (currentLaser.getDirection() == Direction.STATIC) continue;
 
-            Map<Direction, Position> positionMap = Map.of(
-                    Direction.SE, new Position(1, 1),
-                    Direction.SW, new Position(1, -1),
-                    Direction.NE, new Position(-1, 1),
-                    Direction.NW, new Position(-1, -1),
-                    Direction.S, new Position(2, 0),
-                    Direction.N, new Position(-2, 0),
-                    Direction.E, new Position(0, 2),
-                    Direction.W, new Position(0, -2)
-            );
+            Map<Direction, Position> movementMap = currentLaserPosition.getMovementMap();
+            DisplacementApplier applier = new DisplacementApplier(movementMap);
 
-            DisplacementApplier applier = new DisplacementApplier(positionMap);
-            Position delta = applier.getDisplacement(currentLaser.getDirection());
-            Position newPosition = applier.applyDisplacement(currentLaserPosition, delta);
-
-            if (newPosition.getRow() < 0 || newPosition.getRow() > 2*row || newPosition.getColumn() < 0 || newPosition.getColumn() > 2*column) {
-                continue;
-            }
+            Position newPosition = currentLaserPosition.rePosition(currentLaser, currentLaserPosition, applier, row, column);
+            if (newPosition == null) continue;
 
             Laser newLaser = new Laser(currentLaser.getDirection());
 
@@ -141,6 +129,24 @@ public class Board implements Observable<String> {
             }
         }
         lasers.putAll(auxMap);
+    }
+
+    public boolean isWin() {
+        int objectivesCrossed = objectives.size();
+        Map<Position, Laser> laserPositions = new HashMap<>();
+
+        for (Map.Entry<Pair, Laser> entry : lasers.entrySet()) {
+            laserPositions.put(entry.getKey().getPosition(), entry.getValue());
+        }
+
+        for (Map.Entry<Position, Objective> currentElement : objectives.entrySet()) {
+            Position currentObjectivePosition = currentElement.getKey();
+            if (laserPositions.containsKey(currentObjectivePosition)) {
+                objectivesCrossed -= 1;
+            }
+        }
+
+        return objectivesCrossed == 0;
     }
 
     public int getRow() {

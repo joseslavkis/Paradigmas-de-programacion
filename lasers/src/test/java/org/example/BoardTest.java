@@ -1,10 +1,12 @@
 package org.example;
 
+import com.sun.source.tree.AssertTree;
 import logic.*;
 import logic.blocks.*;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -36,8 +38,9 @@ public class BoardTest {
         board.moveAllLaser();
 
         // Verificar que el láser se haya movido correctamente
-        Assert.assertFalse(board.getLasers().containsKey(new Pair(new Position(1, 2), Direction.SE)));
-        Assert.assertEquals(1, board.getLasers().size());
+        Assert.assertEquals(Direction.STATIC, board.getLasers().get(new Pair(new Position(1, 2), Direction.STATIC)).getDirection());
+        Assert.assertEquals(Direction.SE, board.getLasers().get(new Pair(new Position(0, 1), Direction.SE)).getDirection());
+        Assert.assertEquals(2, board.getLasers().size());
     }
 
     @Test
@@ -63,6 +66,178 @@ public class BoardTest {
         Assert.assertEquals(Direction.SE, board.getLasers().get(new Pair(new Position(4, 3), Direction.SE)).getDirection());
         Assert.assertEquals(Direction.SW, board.getLasers().get(new Pair(new Position(5, 4), Direction.SW)).getDirection());
     }
+    @Test
+    public void testLoadBoardLevel4() throws IOException {
+        FileLoader fileLoader = new FileLoader();
+        Map<Position, Block> blocks = fileLoader.loadBlocks("src/test/resources/level4.dat");
+        Map<Pair, Laser> lasers = fileLoader.loadLasers("src/test/resources/level4.dat");
+        Map<Position, Objective> objectives = fileLoader.loadObjectives("src/test/resources/level4.dat");
+        Map<Pair, Laser> primitiveLasers = new HashMap<>(lasers);
+
+        Board board = new Board(4, 4, blocks, objectives, lasers, primitiveLasers);
+        //Blocks
+        Assert.assertTrue(board.getBlocks().get(new Position(1, 1)) instanceof EmptyBlock);
+        Assert.assertTrue(board.getBlocks().get(new Position(1, 3)) instanceof EmptyBlock);
+        Assert.assertTrue(board.getBlocks().get(new Position(1, 5)) instanceof MirrorBlock);
+        Assert.assertTrue(board.getBlocks().get(new Position(1, 7)) instanceof GlassBlock);
+
+        Assert.assertTrue(board.getBlocks().get(new Position(3, 1)) instanceof EmptyBlock);
+        Assert.assertTrue(board.getBlocks().get(new Position(3, 3)) instanceof EmptyBlock);
+        Assert.assertTrue(board.getBlocks().get(new Position(3, 5)) instanceof EmptyBlock);
+        Assert.assertTrue(board.getBlocks().get(new Position(3, 7)) instanceof MirrorBlock);
+
+        Assert.assertTrue(board.getBlocks().get(new Position(5, 1)) instanceof EmptyBlock);
+        Assert.assertTrue(board.getBlocks().get(new Position(5, 3)) instanceof EmptyBlock);
+        Assert.assertTrue(board.getBlocks().get(new Position(5, 5)) instanceof EmptyBlock);
+        Assert.assertTrue(board.getBlocks().get(new Position(5, 7)) instanceof EmptyBlock);
+
+        Assert.assertTrue(board.getBlocks().get(new Position(7, 1)) instanceof EmptyBlock);
+        Assert.assertTrue(board.getBlocks().get(new Position(7, 3)) instanceof EmptyBlock);
+        Assert.assertTrue(board.getBlocks().get(new Position(7, 5)) instanceof FixedOpaqueBlock);
+        Assert.assertTrue(board.getBlocks().get(new Position(7, 7)) instanceof EmptyBlock);
+        //Objectives
+        Assert.assertNotNull(board.getObjectives().get(new Position(3, 2)));
+        Assert.assertNotNull(board.getObjectives().get(new Position(4, 3)));
+        Assert.assertNotNull(board.getObjectives().get(new Position(5, 4)));
+        Assert.assertNotNull(board.getObjectives().get(new Position(6, 5)));
+        Assert.assertNotNull(board.getObjectives().get(new Position(7, 6)));
+        //Lasers
+        int i = 0;
+        while(i < board.getRow()*4) {
+            board.moveAllLaser();
+            i++;
+        }
+        //Assert.assertEquals(9, board.getLasers().size());
+        // Origenes
+        Assert.assertEquals(Direction.NW, board.getLasers().get(new Pair(new Position(7, 8), Direction.NW)).getDirection());
+        Assert.assertEquals(Direction.NW, board.getLasers().get(new Pair(new Position(6, 7), Direction.NW)).getDirection());
+        Assert.assertEquals(Direction.NW, board.getLasers().get(new Pair(new Position(5, 6), Direction.NW)).getDirection());
+        Assert.assertEquals(Direction.NW, board.getLasers().get(new Pair(new Position(4, 5), Direction.NW)).getDirection());
+        Assert.assertEquals(Direction.NW, board.getLasers().get(new Pair(new Position(3, 4), Direction.NW)).getDirection());
+        Assert.assertEquals(Direction.NW, board.getLasers().get(new Pair(new Position(2, 3), Direction.NW)).getDirection());
+        Assert.assertEquals(Direction.NW, board.getLasers().get(new Pair(new Position(1, 2), Direction.NW)).getDirection());
+        Assert.assertEquals(Direction.NW, board.getLasers().get(new Pair(new Position(0, 1), Direction.NW)).getDirection());
+
+        board.moveBlock(new Position(1, 5), new Position(1, 3));
+        board.resetLasers();
+        //chequear que se movio el bloque
+        Assert.assertTrue(board.getBlocks().get(new Position(1, 5)) instanceof EmptyBlock);
+        Assert.assertTrue(board.getBlocks().get(new Position(1, 3)) instanceof MirrorBlock);
+        //chequear los otros blques
+        Assert.assertTrue(board.getBlocks().get(new Position(1, 1)) instanceof EmptyBlock);
+        Assert.assertTrue(board.getBlocks().get(new Position(1, 7)) instanceof GlassBlock);
+
+        Assert.assertTrue(board.getBlocks().get(new Position(3, 1)) instanceof EmptyBlock);
+        Assert.assertTrue(board.getBlocks().get(new Position(3, 3)) instanceof EmptyBlock);
+        Assert.assertTrue(board.getBlocks().get(new Position(3, 5)) instanceof EmptyBlock);
+        Assert.assertTrue(board.getBlocks().get(new Position(3, 7)) instanceof MirrorBlock);
+
+        Assert.assertTrue(board.getBlocks().get(new Position(5, 1)) instanceof EmptyBlock);
+        Assert.assertTrue(board.getBlocks().get(new Position(5, 3)) instanceof EmptyBlock);
+        Assert.assertTrue(board.getBlocks().get(new Position(5, 5)) instanceof EmptyBlock);
+        Assert.assertTrue(board.getBlocks().get(new Position(5, 7)) instanceof EmptyBlock);
+
+        Assert.assertTrue(board.getBlocks().get(new Position(7, 1)) instanceof EmptyBlock);
+        Assert.assertTrue(board.getBlocks().get(new Position(7, 3)) instanceof EmptyBlock);
+        Assert.assertTrue(board.getBlocks().get(new Position(7, 5)) instanceof FixedOpaqueBlock);
+        Assert.assertTrue(board.getBlocks().get(new Position(7, 7)) instanceof EmptyBlock);
+        int j = 0;
+        while(j < board.getRow()*3) {
+            board.moveAllLaser();
+            j++;
+        }
+        //chequear que se resetearon los lasers
+        Assert.assertEquals(9, board.getLasers().size());
+        Assert.assertEquals(Direction.SW, board.getLasers().get(new Pair(new Position(5, 0), Direction.SW)).getDirection());
+        Assert.assertEquals(Direction.SW, board.getLasers().get(new Pair(new Position(4, 1), Direction.SW)).getDirection());
+        Assert.assertEquals(Direction.SW, board.getLasers().get(new Pair(new Position(3, 2), Direction.SW)).getDirection());
+        Assert.assertEquals(Direction.SW, board.getLasers().get(new Pair(new Position(2, 3), Direction.SW)).getDirection());
+        Assert.assertEquals(Direction.NW, board.getLasers().get(new Pair(new Position(3, 4), Direction.NW)).getDirection());
+        Assert.assertEquals(Direction.NW, board.getLasers().get(new Pair(new Position(4, 5), Direction.NW)).getDirection());
+        Assert.assertEquals(Direction.NW, board.getLasers().get(new Pair(new Position(5, 6), Direction.NW)).getDirection());
+        Assert.assertEquals(Direction.NW, board.getLasers().get(new Pair(new Position(6, 7), Direction.NW)).getDirection());
+        Assert.assertEquals(Direction.NW, board.getLasers().get(new Pair(new Position(7, 8), Direction.NW)).getDirection());
+
+        board.moveBlock(new Position(3, 7), new Position(3, 1));
+        board.resetLasers();
+
+        int k = 0;
+        while(k < board.getRow()*3) {
+            board.moveAllLaser();
+            k++;
+        }
+
+        //chequear que se movio el bloque
+        Assert.assertTrue(board.getBlocks().get(new Position(3, 7)) instanceof EmptyBlock);
+        Assert.assertTrue(board.getBlocks().get(new Position(3, 1)) instanceof MirrorBlock);
+
+        //chequear demas bloques
+        Assert.assertTrue(board.getBlocks().get(new Position(1, 1)) instanceof EmptyBlock);
+        Assert.assertTrue(board.getBlocks().get(new Position(1, 3)) instanceof MirrorBlock);
+        Assert.assertTrue(board.getBlocks().get(new Position(1, 5)) instanceof EmptyBlock);
+        Assert.assertTrue(board.getBlocks().get(new Position(1, 7)) instanceof GlassBlock);
+
+        Assert.assertTrue(board.getBlocks().get(new Position(3, 3)) instanceof EmptyBlock);
+        Assert.assertTrue(board.getBlocks().get(new Position(3, 5)) instanceof EmptyBlock);
+
+        Assert.assertTrue(board.getBlocks().get(new Position(5, 1)) instanceof EmptyBlock);
+        Assert.assertTrue(board.getBlocks().get(new Position(5, 3)) instanceof EmptyBlock);
+        Assert.assertTrue(board.getBlocks().get(new Position(5, 5)) instanceof EmptyBlock);
+        Assert.assertTrue(board.getBlocks().get(new Position(5, 7)) instanceof EmptyBlock);
+
+        Assert.assertTrue(board.getBlocks().get(new Position(7, 1)) instanceof EmptyBlock);
+        Assert.assertTrue(board.getBlocks().get(new Position(7, 3)) instanceof EmptyBlock);
+        Assert.assertTrue(board.getBlocks().get(new Position(7, 5)) instanceof FixedOpaqueBlock);
+        Assert.assertTrue(board.getBlocks().get(new Position(7, 7)) instanceof EmptyBlock);
+
+        //chequear que se resetearon los lasers
+        Assert.assertEquals(10, board.getLasers().size());
+        Assert.assertEquals(Direction.SW, board.getLasers().get(new Pair(new Position(2, 3), Direction.SW)).getDirection());
+        Assert.assertEquals(Direction.NW, board.getLasers().get(new Pair(new Position(3, 4), Direction.NW)).getDirection());
+        Assert.assertEquals(Direction.NW, board.getLasers().get(new Pair(new Position(4, 5), Direction.NW)).getDirection());
+        Assert.assertEquals(Direction.NW, board.getLasers().get(new Pair(new Position(5, 6), Direction.NW)).getDirection());
+        Assert.assertEquals(Direction.NW, board.getLasers().get(new Pair(new Position(6, 7), Direction.NW)).getDirection());
+        Assert.assertEquals(Direction.NW, board.getLasers().get(new Pair(new Position(7, 8), Direction.NW)).getDirection());
+        Assert.assertEquals(Direction.SE, board.getLasers().get(new Pair(new Position(3, 2), Direction.SE)).getDirection());
+        Assert.assertEquals(Direction.SE, board.getLasers().get(new Pair(new Position(4, 3), Direction.SE)).getDirection());
+        Assert.assertEquals(Direction.SE, board.getLasers().get(new Pair(new Position(5, 4), Direction.SE)).getDirection());
+        Assert.assertEquals(Direction.STATIC, board.getLasers().get(new Pair(new Position(6, 5), Direction.STATIC)).getDirection());
+        Assert.assertNull(board.getLasers().get(new Pair(new Position(7, 6), Direction.SE)));
+
+        board.moveBlock(new Position(1, 7), new Position(5, 7));
+        board.resetLasers();
+
+        int w = 0;
+        while(w < board.getRow()*3) {
+            board.moveAllLaser();
+            w++;
+        }
+
+        //chequear demas bloques
+        Assert.assertTrue(board.getBlocks().get(new Position(1, 1)) instanceof EmptyBlock);
+        Assert.assertTrue(board.getBlocks().get(new Position(1, 3)) instanceof MirrorBlock);
+        Assert.assertTrue(board.getBlocks().get(new Position(1, 5)) instanceof EmptyBlock);
+        Assert.assertTrue(board.getBlocks().get(new Position(1, 7)) instanceof EmptyBlock);
+
+        Assert.assertTrue(board.getBlocks().get(new Position(3, 3)) instanceof EmptyBlock);
+        Assert.assertTrue(board.getBlocks().get(new Position(3, 5)) instanceof EmptyBlock);
+        Assert.assertTrue(board.getBlocks().get(new Position(3, 7)) instanceof EmptyBlock);
+        Assert.assertTrue(board.getBlocks().get(new Position(3, 1)) instanceof MirrorBlock);
+
+        Assert.assertTrue(board.getBlocks().get(new Position(5, 1)) instanceof EmptyBlock);
+        Assert.assertTrue(board.getBlocks().get(new Position(5, 3)) instanceof EmptyBlock);
+        Assert.assertTrue(board.getBlocks().get(new Position(5, 5)) instanceof EmptyBlock);
+        Assert.assertTrue(board.getBlocks().get(new Position(5, 7)) instanceof GlassBlock);
+
+        Assert.assertTrue(board.getBlocks().get(new Position(7, 1)) instanceof EmptyBlock);
+        Assert.assertTrue(board.getBlocks().get(new Position(7, 3)) instanceof EmptyBlock);
+        Assert.assertTrue(board.getBlocks().get(new Position(7, 5)) instanceof FixedOpaqueBlock);
+        Assert.assertTrue(board.getBlocks().get(new Position(7, 7)) instanceof EmptyBlock);
+
+        Assert.assertEquals(12, board.getLasers().size());
+        Assert.assertEquals(Direction.NW, board.getLasers().get(new Pair(new Position(6, 7), Direction.NW)).getDirection());
+        Assert.assertTrue(board.isWin());
+    }
 
     @Test
     public void testLoadBoardLevel5() throws IOException {
@@ -79,10 +254,10 @@ public class BoardTest {
         Assert.assertNotNull(board.getLasers().get(new Pair(new Position(2, 5), Direction.SW)));
         Assert.assertNotNull(board.getObjectives().get(new Position(6, 3)));
         Assert.assertNotNull(board.getObjectives().get(new Position(8, 7)));
-        int i = 0;
-        while(i < 3) {
+        int j = 0;
+        while(j < 3) {
             board.moveAllLaser();
-            i++;
+            j++;
         }
         Assert.assertEquals(Direction.SW, board.getLasers().get(new Pair(new Position(2, 5), Direction.SW)).getDirection());
         // Crystal Block
@@ -100,10 +275,11 @@ public class BoardTest {
         Assert.assertTrue(board.getBlocks().get(new Position(5, 1)) instanceof EmptyBlock);
         Assert.assertTrue(board.getBlocks().get(new Position(5, 3)) instanceof GlassBlock);
 
-        int j = 0;
-        while(j < 3) {
+
+        int i = 0;
+        while(i < 3) {
             board.moveAllLaser();
-            j++;
+            i++;
         }
 
         Assert.assertEquals(Direction.SW, board.getLasers().get(new Pair(new Position(2, 5), Direction.SW)).getDirection());

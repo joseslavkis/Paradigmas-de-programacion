@@ -1,10 +1,27 @@
 package logic;
+import java.util.Map;
 import java.util.Objects;
+
+import javafx.geometry.Pos;
 import logic.blocks.Side;
 
 public class Position {
     private int row;
     private int column;
+    private static final Map<Direction, Position> movementMap = Map.of(
+            Direction.SE, new Position(1, 1),
+            Direction.SW, new Position(1, -1),
+            Direction.NE, new Position(-1, 1),
+            Direction.NW, new Position(-1, -1),
+            Direction.S, new Position(2, 0),
+            Direction.N, new Position(-2, 0),
+            Direction.E, new Position(0, 2),
+            Direction.W, new Position(0, -2)
+    );
+
+    public Map<Direction, Position> getMovementMap() {
+        return movementMap;
+    }
 
     public Position(int row, int column) {
         this.column = column;
@@ -51,11 +68,13 @@ public class Position {
         return Objects.hash(row, column);
     }
 
-    public void setColumn(int column) {
-        this.column = column;
-    }
+    public Position rePosition(Laser currentLaser, Position currentLaserPosition, DisplacementApplier applier, int row, int column) {
+        Position delta = applier.getDisplacement(currentLaser.getDirection());
+        Position newPosition = applier.applyDisplacement(currentLaserPosition, delta);
 
-    public void setRow(int row) {
-        this.row = row;
+        if (newPosition.getRow() < 0 || newPosition.getRow() > 2*row || newPosition.getColumn() < 0 || newPosition.getColumn() > 2*column) {
+            return null;
+        }
+        return newPosition;
     }
 }
