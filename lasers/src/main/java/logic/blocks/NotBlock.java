@@ -13,6 +13,6 @@ public class NotBlock implements Block {
 
     @Override
     public BlockType getType() {
-        return BlockType.NOT_BLOCK;
+        return BlockType.NOT;
     }
 }

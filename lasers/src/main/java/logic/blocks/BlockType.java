@@ -4,8 +4,8 @@ public enum BlockType {
     MIRROR,
     GLASS,
     CRYSTAL,
-    NOT_BLOCK,
-    EMPTY_BLOCK,
+    NOT,
+    EMPTY,
     FIXED_OPAQUE,
     MOBILE_OPAQUE,
 }

@@ -49,7 +49,7 @@ public class Board implements Observable<String> {
         Block block1 = blocks.get(from);
         Block block2 = blocks.get(to);
 
-        if (block1.getType() == BlockType.NOT_BLOCK || block2.getType() == BlockType.NOT_BLOCK) return;
+        if (block1.getType() == BlockType.NOT || block2.getType() == BlockType.NOT) return;
 
         blocks.put(from, block2);
         blocks.put(to, block1);

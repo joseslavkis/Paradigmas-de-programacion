@@ -9,7 +9,7 @@ public class EmptyBlock implements Block {
 
     @Override
     public BlockType getType() {
-        return BlockType.EMPTY_BLOCK;
+        return BlockType.EMPTY;
     }
 
  

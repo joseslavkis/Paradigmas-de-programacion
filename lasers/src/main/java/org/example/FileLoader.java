@@ -11,6 +11,7 @@ import java.util.Map;
 
 public class FileLoader {
     public static final char SPACE = ' ';
+
     public Map<Position, Block> loadBlocks(String filePath) throws IOException {
         Map<Position, Block> blocks = new HashMap<>();
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
@@ -54,6 +55,27 @@ public class FileLoader {
             }
         }
         return blocks;
+    }
+
+    public int getRowCount(String filePath) throws IOException {
+        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+            int rowCount = 0;
+            String line;
+            while ((line = reader.readLine()) != null && !line.isEmpty()) {
+                rowCount++;
+            }
+            return rowCount;
+        }
+    }
+
+    public int getColumnCount(String filePath) throws IOException {
+        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+            String line = reader.readLine();
+            if (line != null) {
+                return line.length();
+            }
+        }
+        return 0;
     }
 
     public Map<Pair, Laser> loadLasers(String filePath) throws IOException {

@@ -2,10 +2,9 @@ package logic;
 import java.util.Map;
 import java.util.Objects;
 
-import javafx.geometry.Pos;
 import logic.blocks.Side;
 
-public class Position {
+public class Position implements Comparable<Position> {
     private int row;
     private int column;
     private static final Map<Direction, Position> movementMap = Map.of(
@@ -76,5 +75,14 @@ public class Position {
             return null;
         }
         return newPosition;
+    }
+
+    @Override
+    public int compareTo(Position o) {
+        int rowCompare = Integer.compare(this.row, o.row);
+        if (rowCompare != 0) {
+            return rowCompare;
+        }
+        return Integer.compare(this.column, o.column);
     }
 }

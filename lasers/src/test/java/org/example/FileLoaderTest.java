@@ -30,6 +30,28 @@ public class FileLoaderTest {
     }
 
     @Test
+    public void testGetRowCount() throws IOException {
+        FileLoader fileLoader = new FileLoader();
+        String filePath = "src/test/resources/level1.dat";
+
+        int expectedRowCount = 6;
+        int actualRowCount = fileLoader.getRowCount(filePath);
+
+        Assert.assertEquals(expectedRowCount, actualRowCount);
+    }
+
+    @Test
+    public void testGetColumnCount() throws IOException {
+        FileLoader fileLoader = new FileLoader();
+        String filePath = "src/test/resources/level1.dat";
+
+        int expectedColumnCount = 4;
+        int actualColumnCount = fileLoader.getColumnCount(filePath);
+
+        Assert.assertEquals(expectedColumnCount, actualColumnCount);
+    }
+
+    @Test
     public void testLoadLasers() throws IOException {
         FileLoader fileLoader = new FileLoader();
         Map<Pair, Laser> lasers = fileLoader.loadLasers("src/test/resources/test_level.dat");
