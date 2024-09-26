@@ -3,8 +3,10 @@ package org.example;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
@@ -24,7 +26,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class App extends Application {
-
     private VBox mainArea;
     private Board board;
 
@@ -44,8 +45,11 @@ public class App extends Application {
         root.setSpacing(20);
         root.getChildren().addAll(levelsBox, mainArea);
 
-        Scene scene = new Scene(root, 500, 450);
+        Scene scene = new Scene(root, 750, 800);
+
+        stage.setResizable(false);
         stage.setScene(scene);
+        stage.setTitle("Lasers");
         stage.show();
     }
 
@@ -53,7 +57,8 @@ public class App extends Application {
         VBox levelsBox = new VBox();
         for (int i = 1; i <= 6; i++) {
             Button levelButton = new Button("Level " + i);
-            levelButton.setPrefWidth(100);
+            levelButton.setPrefWidth(150);
+            levelButton.setPrefHeight(150);
             int level = i;
             levelButton.setOnAction(e -> loadLevel(level));
             levelsBox.getChildren().add(levelButton);
@@ -73,7 +78,7 @@ public class App extends Application {
             int col = fileLoader.getColumnCount(filePath);
 
             Board board = new Board(row, col, blocks, objectives, lasers, primitiveLasers);
-            updateMainArea(blocks, row, col);
+            updateMainArea(blocks, objectives, row, col);
         } catch (FileNotFoundException e) {
             showError("Unexpected error: " + e.getMessage());
         } catch (IOException e) {
@@ -91,54 +96,44 @@ public class App extends Application {
         System.err.println(message);
     }
 
-    private void updateMainArea(Map<Position, Block> blocks, int row, int col) {
+    private void updateMainArea(Map<Position, Block> blocks, Map<Position, Objective> objectives, int row, int col) {
         mainArea.getChildren().clear();
-        TilePane tilePane1 = new TilePane();
-        tilePane1.setPrefColumns(col);
-        tilePane1.setPrefRows(row);
-        tilePane1.setTileAlignment( Pos.CENTER );
-
-        mainArea.getChildren().clear();
-        TilePane tilePane2 = new TilePane();
-        tilePane2.setPrefColumns(col);
-        tilePane2.setPrefRows(row);
-        tilePane2.setTileAlignment( Pos.CENTER );
+        mainArea.setAlignment(Pos.TOP_CENTER);
+        TilePane tilePane = new TilePane();
+        tilePane.setPrefColumns(col);
+        tilePane.setPrefRows(row);
 
         Set<Map.Entry<Position, Block>> entrySet = blocks.entrySet();
         List<Map.Entry<Position, Block>> sortedList = entrySet.stream()
                 .sorted(Map.Entry.comparingByKey())
                 .collect(Collectors.toList());
 
-        for (Map.Entry<Position, Block> positionBlockEntry : sortedList) {
-            Image blockImage = getBlockImage(positionBlockEntry.getValue());
+        for (Map.Entry<Position, Block> entry : sortedList) {
+            Image blockImage = getBlockImage(entry.getValue());
             if (blockImage != null) {
                 ImageView imageView = new ImageView(blockImage);
-                tilePane1.getChildren().add(imageView);
+                tilePane.getChildren().add(imageView);
             }
         }
 
-//        Set<Map.Entry<Position, Block>> entrySetObjectives = blocks.entrySet();
-//        List<Map.Entry<Position, Block>> sortedListObjectives = entrySet.stream()
-//                .sorted(Map.Entry.comparingByKey())
-//                .collect(Collectors.toList());
-//
-//        for (Map.Entry<Position, Block> positionObjectiveEntry : sortedListObjectives) {
-//            Image blockImage = getBlockImage(positionObjectiveEntry.getValue());
-//            if (blockImage != null) {
-//                ImageView imageView = new ImageView(blockImage);
-//                tilePane2.getChildren().add(imageView);
-//            }
-//        }
-
-        mainArea.getChildren().add(tilePane1);
-//        mainArea.getChildren().add(tilePane2);
-
+        mainArea.getChildren().add(tilePane);
     }
-
 
     private Image getBlockImage(Block block) {
         String imageName = block.getType().name().toLowerCase() + "_block.png";
         try (FileInputStream input = new FileInputStream("src/main/java/org/example/pngs/" + imageName)) {
+            return new Image(input);
+        } catch (FileNotFoundException e) {
+            showError("Unexpected error: " + e.getMessage());
+            return null;
+        } catch (IOException e) {
+            showError("Unexpected error: " + e.getMessage());
+            return null;
+        }
+    }
+
+    private Image getObjectiveImage() {
+        try (FileInputStream input = new FileInputStream("src/main/java/org/example/pngs/objective.png")) {
             return new Image(input);
         } catch (FileNotFoundException e) {
             showError("Unexpected error: " + e.getMessage());
