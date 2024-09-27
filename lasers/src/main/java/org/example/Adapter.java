@@ -21,6 +21,7 @@ import java.util.Map;
 public class Adapter {
     private final int multiplier;
     private final VBox mainArea;
+    private Board board;
     private final HashMap<String, String> imagePathMap = new HashMap<>();
     {
         imagePathMap.put("objective", "objectives/objective.png");
@@ -42,7 +43,7 @@ public class Adapter {
         imagePathMap.put("sw", "lasers/laser_sw.png");
     }
 
-    public Adapter (VBox mainArea, int multiplier){
+    public Adapter(VBox mainArea, int multiplier) {
         this.mainArea = mainArea;
         this.multiplier = multiplier;
     }
@@ -57,6 +58,7 @@ public class Adapter {
 
         return new Scene(root, 750, 800);
     }
+
     private VBox createLevelsBox() {
         VBox levelsBox = new VBox();
         for (int i = 1; i <= 6; i++) {
@@ -81,9 +83,9 @@ public class Adapter {
             int row = fileLoader.getRowCount(filePath);
             int col = fileLoader.getColumnCount(filePath);
 
-            Board board = new Board(row, col, blocks, objectives, lasers, primitiveLasers);
-
+            this.board = new Board(row, col, blocks, objectives, lasers, primitiveLasers);
             updateMainArea(blocks, objectives, primitiveLasers, lasers, row, col);
+            moveLasers();
         } catch (FileNotFoundException e) {
             showError("Unexpected error: " + e.getMessage());
         } catch (IOException e) {
@@ -101,7 +103,8 @@ public class Adapter {
         System.err.println(message);
     }
 
-    private void updateMainArea(Map<Position, Block> blocks, Map<Position, Objective> objectives, Map<Pair, Laser> primitive, Map<Pair, Laser> lasers, int row, int col) {
+    private void updateMainArea(Map<Position, Block> blocks, Map<Position, Objective> objectives,
+                                Map<Pair, Laser> primitive, Map<Pair, Laser> lasers, int row, int col) {
         mainArea.getChildren().clear();
         mainArea.setAlignment(Pos.TOP_CENTER);
 
@@ -109,43 +112,53 @@ public class Adapter {
         pane.setPrefSize(col * multiplier, row * multiplier);
         pane.setPadding(new Insets(10));
 
-        blocks.forEach(((position, block) -> {
+        // Dibuja bloques
+        blocks.forEach((position, block) -> {
             ImageView blockImageView = new ImageView(getElementImage(block.getType().name().toLowerCase()));
             int x = position.getColumn() * multiplier;
             int y = position.getRow() * multiplier;
             blockImageView.setLayoutX(x);
             blockImageView.setLayoutY(y);
-
             pane.getChildren().add(blockImageView);
-        }));
+        });
 
+        // Dibuja objetivos
         objectives.forEach((position, objective) -> {
             ImageView objectiveImageView = new ImageView(getElementImage("objective"));
             int x = position.getColumn() * multiplier;
             int y = position.getRow() * multiplier;
             objectiveImageView.setLayoutX(x);
             objectiveImageView.setLayoutY(y);
-
             pane.getChildren().add(objectiveImageView);
         });
-
-        primitive.forEach(((Pair, laser) -> {
+System
+        // Dibuja salida de lasers
+        primitive.forEach((pair, laser) -> {
             ImageView primitiveImageView = new ImageView(getElementImage("impacted"));
-            Position currentPosition = Pair.getPosition();
+            Position currentPosition = pair.getPosition();
             int x = currentPosition.getColumn() * multiplier;
             int y = currentPosition.getRow() * multiplier;
             primitiveImageView.setLayoutX(x);
             primitiveImageView.setLayoutY(y);
-
             pane.getChildren().add(primitiveImageView);
-        }));
+        });
+
+        // Dibuja láseres
+        lasers.forEach((pair, laser) -> {
+            ImageView laserImageView = new ImageView(getElementImage(laser.getDirection().name().toLowerCase()));
+            Position currentPosition = pair.getPosition();
+            int x = currentPosition.getColumn() * multiplier;
+            int y = currentPosition.getRow() * multiplier;
+            laserImageView.setLayoutX(x);
+            laserImageView.setLayoutY(y);
+            pane.getChildren().add(laserImageView);
+        });
 
         mainArea.getChildren().add(pane);
     }
 
     private Image getElementImage(String request) {
         String currentPathImage = imagePathMap.get(request);
-
         try (FileInputStream input = new FileInputStream("src/main/java/org/example/pngs/" + currentPathImage)) {
             return new Image(input);
         } catch (FileNotFoundException e) {
@@ -154,6 +167,17 @@ public class Adapter {
         } catch (IOException e) {
             showError("Unexpected error: " + e.getMessage());
             return null;
+        }
+    }
+
+    private void moveLasers() {
+        if (board != null) {
+            int i = 0;
+            while(i < board.getRow()*3) {
+                board.moveAllLaser();
+                i++;
+            }
+            updateMainArea(board.getBlocks(), board.getObjectives(), board.getPrimitiveLasers(), board.getLasers(), board.getRow(), board.getColumn());
         }
     }
 }

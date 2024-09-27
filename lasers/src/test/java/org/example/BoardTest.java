@@ -74,7 +74,9 @@ public class BoardTest {
         Map<Position, Objective> objectives = fileLoader.loadObjectives("src/test/resources/level4.dat");
         Map<Pair, Laser> primitiveLasers = new HashMap<>(lasers);
 
+
         Board board = new Board(4, 4, blocks, objectives, lasers, primitiveLasers);
+
         //Blocks
         Assert.assertTrue(board.getBlocks().get(new Position(1, 1)) instanceof EmptyBlock);
         Assert.assertTrue(board.getBlocks().get(new Position(1, 3)) instanceof EmptyBlock);
@@ -236,6 +238,7 @@ public class BoardTest {
 
         Assert.assertEquals(12, board.getLasers().size());
         Assert.assertEquals(Direction.NW, board.getLasers().get(new Pair(new Position(6, 7), Direction.NW)).getDirection());
+
         Assert.assertTrue(board.isWin());
     }
 

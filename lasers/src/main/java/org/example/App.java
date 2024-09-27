@@ -1,14 +1,20 @@
 package org.example;
 
 import javafx.application.Application;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Labeled;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.TilePane;
@@ -28,13 +34,15 @@ import java.util.stream.Collectors;
 
 public class App extends Application {
 
+    private Scene source;
+
     public static void main(String[] args) {
         launch();
     }
 
     @Override
     public void start(Stage stage) {
-        stage.setTitle("Game Levels");
+        stage.setTitle("Game Levels");        
         Scene scene = new Adapter(new VBox(), 58).setGUI();
 
         stage.setResizable(false);

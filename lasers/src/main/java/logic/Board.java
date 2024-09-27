@@ -35,10 +35,13 @@ public class Board implements Observable<String> {
         return lasers;
     }
 
+    public Map<Pair, Laser> getPrimitiveLasers() {
+        return primitiveLasers;
+    }
+
     public void resetLasers() {
         this.lasers = new HashMap<>(primitiveLasers);
     }
-
 
     @Override
     public void addListener(Listener<String> listener) {

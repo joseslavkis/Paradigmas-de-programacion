@@ -54,11 +54,13 @@ public class FileLoaderTest {
     @Test
     public void testLoadLasers() throws IOException {
         FileLoader fileLoader = new FileLoader();
-        Map<Pair, Laser> lasers = fileLoader.loadLasers("src/test/resources/test_level.dat");
+        Map<Pair, Laser> lasers = fileLoader.loadLasers("src/test/resources/level6.dat");
 
         // Verificar que los láseres se cargaron correctamente
         Assert.assertEquals(1, lasers.size());
         Assert.assertEquals(Direction.SE, lasers.get(new Pair(new Position(5, 0), Direction.SE)).getDirection());
+
+
     }
 
     @Test
@@ -71,7 +73,6 @@ public class FileLoaderTest {
         Assert.assertNotNull(objectives.get(new Position(3, 4)));
 
         Map<Position, Objective> objectives2 = fileLoader.loadObjectives("src/test/resources/level6.dat");
-
         Assert.assertEquals(4, objectives2.size());
         Assert.assertNotNull(objectives2.get(new Position(6, 1)));
         Assert.assertNotNull(objectives2.get(new Position(4, 3)));
