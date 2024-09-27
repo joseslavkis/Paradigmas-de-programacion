@@ -10,6 +10,7 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -28,6 +29,7 @@ import java.util.stream.Collectors;
 public class App extends Application {
     private VBox mainArea;
     private Board board;
+    private final int multiplier = 58;
 
     public static void main(String[] args) {
         launch();
@@ -99,9 +101,10 @@ public class App extends Application {
     private void updateMainArea(Map<Position, Block> blocks, Map<Position, Objective> objectives, int row, int col) {
         mainArea.getChildren().clear();
         mainArea.setAlignment(Pos.TOP_CENTER);
-        TilePane tilePane = new TilePane();
-        tilePane.setPrefColumns(col);
-        tilePane.setPrefRows(row);
+
+        Pane pane = new Pane();
+        pane.setPrefSize(col * multiplier, row * multiplier);  // Ajusta el tamaño del pane según la cantidad de filas y columnas
+        pane.setPadding(new Insets(10));
 
         Set<Map.Entry<Position, Block>> entrySet = blocks.entrySet();
         List<Map.Entry<Position, Block>> sortedList = entrySet.stream()
@@ -112,11 +115,27 @@ public class App extends Application {
             Image blockImage = getBlockImage(entry.getValue());
             if (blockImage != null) {
                 ImageView imageView = new ImageView(blockImage);
-                tilePane.getChildren().add(imageView);
+
+                int x = entry.getKey().getColumn() * multiplier;
+                int y = entry.getKey().getRow() * multiplier;
+                imageView.setLayoutX(x);
+                imageView.setLayoutY(y);
+
+                pane.getChildren().add(imageView);
             }
         }
 
-        mainArea.getChildren().add(tilePane);
+        objectives.forEach((position, objective) -> {
+            ImageView objectiveImageView = new ImageView(getObjectiveImage());
+            int x = position.getColumn() * multiplier;
+            int y = position.getRow() * multiplier;
+            objectiveImageView.setLayoutX(x);
+            objectiveImageView.setLayoutY(y);
+
+            pane.getChildren().add(objectiveImageView);
+        });
+
+        mainArea.getChildren().add(pane);
     }
 
     private Image getBlockImage(Block block) {
