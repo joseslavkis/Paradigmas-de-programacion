@@ -252,31 +252,32 @@ public class BoardTest {
 
         Board board = new Board(4, 4, blocks, objectives, lasers, primitiveLasers);
 
-        // Verificar que los bloques, láseres y objetivos se cargaron correctamente.
+        // Verificar que los bloques, láseres y objetivos se cargaron correctamente
         Assert.assertTrue(board.getBlocks().get(new Position(1, 1)) instanceof NotBlock);
         Assert.assertNotNull(board.getLasers().get(new Pair(new Position(2, 5), Direction.SW)));
         Assert.assertNotNull(board.getObjectives().get(new Position(6, 3)));
         Assert.assertNotNull(board.getObjectives().get(new Position(8, 7)));
         int j = 0;
-        while(j < 3) {
+        while(j < 6) {
             board.moveAllLaser();
             j++;
         }
+        Assert.assertEquals(5, board.getLasers().size());
         Assert.assertEquals(Direction.SW, board.getLasers().get(new Pair(new Position(2, 5), Direction.SW)).getDirection());
         // Crystal Block
         Assert.assertEquals(Direction.W, board.getLasers().get(new Pair(new Position(3, 4), Direction.W)).getDirection());
         Assert.assertEquals(Direction.SW, board.getLasers().get(new Pair(new Position(3, 2), Direction.SW)).getDirection());
+
+        Assert.assertEquals(Direction.E, board.getLasers().get(new Pair(new Position(3, 2), Direction.E)).getDirection());
         // Glass Block
         Assert.assertEquals(Direction.SW, board.getLasers().get(new Pair(new Position(4, 1), Direction.SW)).getDirection());
-        Assert.assertEquals(Direction.NW, board.getLasers().get(new Pair(new Position(4, 1), Direction.NW)).getDirection());
-        Assert.assertEquals(Direction.NW, board.getLasers().get(new Pair(new Position(3, 0), Direction.NW)).getDirection());
         Assert.assertEquals(Direction.SW, board.getLasers().get(new Pair(new Position(5, 0), Direction.SW)).getDirection());
 
         board.moveBlock(new Position(5, 1), new Position(5, 3));
         board.resetLasers();
 
         Assert.assertTrue(board.getBlocks().get(new Position(5, 1)) instanceof EmptyBlock);
-        Assert.assertTrue(board.getBlocks().get(new Position(5, 3)) instanceof GlassBlock);
+        Assert.assertTrue(board.getBlocks().get(new Position(3, 3)) instanceof CrystalBlock);
 
 
         int i = 0;

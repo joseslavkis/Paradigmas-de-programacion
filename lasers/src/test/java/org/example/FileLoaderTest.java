@@ -59,8 +59,6 @@ public class FileLoaderTest {
         // Verificar que los láseres se cargaron correctamente
         Assert.assertEquals(1, lasers.size());
         Assert.assertEquals(Direction.SE, lasers.get(new Pair(new Position(5, 0), Direction.SE)).getDirection());
-
-
     }
 
     @Test
@@ -79,5 +77,4 @@ public class FileLoaderTest {
         Assert.assertNotNull(objectives2.get(new Position(4, 5)));
         Assert.assertNotNull(objectives2.get(new Position(5, 8)));
     }
-
 }

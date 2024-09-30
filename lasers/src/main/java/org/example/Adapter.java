@@ -1,11 +1,17 @@
 package org.example;
 
+import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
@@ -23,6 +29,7 @@ public class Adapter {
     private final VBox mainArea;
     private Board board;
     private final HashMap<String, String> imagePathMap = new HashMap<>();
+
     {
         imagePathMap.put("objective", "objectives/objective.png");
         imagePathMap.put("impacted", "objectives/impacted_objective.png");
@@ -51,11 +58,9 @@ public class Adapter {
     public Scene setGUI() {
         VBox levelsBox = createLevelsBox();
         mainArea.setSpacing(5);
-
         HBox root = new HBox();
         root.setSpacing(20);
         root.getChildren().addAll(levelsBox, mainArea);
-
         return new Scene(root, 750, 800);
     }
 
@@ -112,49 +117,48 @@ public class Adapter {
         pane.setPrefSize(col * multiplier, row * multiplier);
         pane.setPadding(new Insets(10));
 
-        // Dibuja bloques
-        blocks.forEach((position, block) -> {
-            ImageView blockImageView = new ImageView(getElementImage(block.getType().name().toLowerCase()));
-            int x = position.getColumn() * multiplier;
-            int y = position.getRow() * multiplier;
-            blockImageView.setLayoutX(x);
-            blockImageView.setLayoutY(y);
-            pane.getChildren().add(blockImageView);
-        });
+        updateBlocks(pane, blocks);
+        updateObjectives(pane, objectives);
+        updateLasers(pane, primitive, lasers);
 
-        // Dibuja objetivos
-        objectives.forEach((position, objective) -> {
-            ImageView objectiveImageView = new ImageView(getElementImage("objective"));
-            int x = position.getColumn() * multiplier;
-            int y = position.getRow() * multiplier;
-            objectiveImageView.setLayoutX(x);
-            objectiveImageView.setLayoutY(y);
-            pane.getChildren().add(objectiveImageView);
+        mainArea.getChildren().add(pane);
+    }
+
+    private void updateBlocks(Pane pane, Map<Position, Block> blocks) {
+        blocks.forEach((position, block) -> {
+            Image image = getElementImage(block.getType().name().toLowerCase());
+            NodeBlock currentBlock = new NodeBlock(block, position, image);
+            pane.getChildren().add(currentBlock);
         });
-System
-        // Dibuja salida de lasers
+    }
+
+    private void updateLasers(Pane pane, Map<Pair, Laser> primitive, Map<Pair, Laser> lasers) {
         primitive.forEach((pair, laser) -> {
             ImageView primitiveImageView = new ImageView(getElementImage("impacted"));
-            Position currentPosition = pair.getPosition();
-            int x = currentPosition.getColumn() * multiplier;
-            int y = currentPosition.getRow() * multiplier;
-            primitiveImageView.setLayoutX(x);
-            primitiveImageView.setLayoutY(y);
+            setPosition(primitiveImageView, pair.getPosition());
             pane.getChildren().add(primitiveImageView);
         });
 
-        // Dibuja láseres
         lasers.forEach((pair, laser) -> {
             ImageView laserImageView = new ImageView(getElementImage(laser.getDirection().name().toLowerCase()));
-            Position currentPosition = pair.getPosition();
-            int x = currentPosition.getColumn() * multiplier;
-            int y = currentPosition.getRow() * multiplier;
-            laserImageView.setLayoutX(x);
-            laserImageView.setLayoutY(y);
+            setPosition(laserImageView, pair.getPosition());
             pane.getChildren().add(laserImageView);
         });
+    }
 
-        mainArea.getChildren().add(pane);
+    private void updateObjectives(Pane pane, Map<Position, Objective> objectives) {
+        objectives.forEach((position, objective) -> {
+            ImageView objectiveImageView = new ImageView(getElementImage("objective"));
+            setPosition(objectiveImageView, position);
+            pane.getChildren().add(objectiveImageView);
+        });
+    }
+
+    private void setPosition(ImageView imageView, Position position) {
+        int x = position.getColumn() * multiplier;
+        int y = position.getRow() * multiplier;
+        imageView.setLayoutX(x);
+        imageView.setLayoutY(y);
     }
 
     private Image getElementImage(String request) {
@@ -173,11 +177,30 @@ System
     private void moveLasers() {
         if (board != null) {
             int i = 0;
-            while(i < board.getRow()*3) {
+            while (i < board.getRow() * 3) {
                 board.moveAllLaser();
                 i++;
             }
             updateMainArea(board.getBlocks(), board.getObjectives(), board.getPrimitiveLasers(), board.getLasers(), board.getRow(), board.getColumn());
         }
+    }
+
+    public Pane getCurrentBoard() {
+        for (Node node : mainArea.getChildren()) {
+            if (node instanceof Pane) {
+                return (Pane) node;
+            }
+        }
+        return null;
+    }
+
+    public void makeMove() {
+        Pane currentBoard = getCurrentBoard();
+        currentBoard.setOnDragDetected((MouseEvent dragEvent) -> {
+            Dragboard db = currentBoard.startDragAndDrop(TransferMode.ANY);
+            ClipboardContent content = new ClipboardContent();
+            db.setContent(content);
+            dragEvent.consume();
+        });
     }
 }
