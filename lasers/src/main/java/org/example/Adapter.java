@@ -76,6 +76,9 @@ public class Adapter {
         }
         return levelsBox;
     }
+    public Board getBoard() {
+        return board;
+    }
 
     private void loadLevel(int level) {
         try {
@@ -130,9 +133,7 @@ public class Adapter {
 
         blocks.forEach((position, block) -> {
             Image image = getElementImage(block.getType().name().toLowerCase());
-            NodeBlock currentBlock = new NodeBlock(block, position, image);
-
-            System.out.println("Adding block at: " + position.getRow() + ", " + position.getColumn());
+            NodeBlock currentBlock = new NodeBlock(block, position, image, this);
 
             pane.getChildren().add(currentBlock);
         });
@@ -181,7 +182,7 @@ public class Adapter {
         }
     }
 
-    private void moveLasers() {
+    public void moveLasers() {
         if (board != null) {
             int i = 0;
             while (i < board.getRow() * 3) {
@@ -192,22 +193,4 @@ public class Adapter {
         }
     }
 
-    public Pane getCurrentBoard() {
-        for (Node node : mainArea.getChildren()) {
-            if (node instanceof Pane) {
-                return (Pane) node;
-            }
-        }
-        return null;
-    }
-
-    public void makeMove() {
-        Pane currentBoard = getCurrentBoard();
-        currentBoard.setOnDragDetected((MouseEvent dragEvent) -> {
-            Dragboard db = currentBoard.startDragAndDrop(TransferMode.ANY);
-            ClipboardContent content = new ClipboardContent();
-            db.setContent(content);
-            dragEvent.consume();
-        });
-    }
 }

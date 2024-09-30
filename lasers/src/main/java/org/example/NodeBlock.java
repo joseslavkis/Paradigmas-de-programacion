@@ -8,6 +8,7 @@ import javafx.scene.input.TransferMode;
 import javafx.scene.layout.Pane;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.DragEvent;
+import logic.Board;
 import logic.Position;
 import logic.blocks.Block;
 
@@ -15,11 +16,13 @@ public class NodeBlock extends Pane {
     private final Block block;
     private Position position;
     private final ImageView blockImageView;
+    private final Adapter adapter;
 
-    public NodeBlock(Block block, Position position, Image image) {
+    public NodeBlock(Block block, Position position, Image image, Adapter adapter) {
         this.block = block;
         this.position = position;
         this.blockImageView = new ImageView(image);
+        this.adapter = adapter;
         getChildren().add(blockImageView);
         setupDragAndDrop();
         setPosition(blockImageView, position);
@@ -53,26 +56,35 @@ public class NodeBlock extends Pane {
                         Integer.parseInt(positions[1])
                 );
 
-                NodeBlock targetBlock = (NodeBlock) event.getGestureSource();
+                Position newPosition = new Position((int)(blockImageView.getLayoutY() / 58), (int)(blockImageView.getLayoutX() / 58)); // TODO: get multiplier from constructor
 
-                Position newPosition = new Position((int)(blockImageView.getLayoutY() / 58), (int)(blockImageView.getLayoutX() / 58)); // TODO: get multiplier from parameter.
-                System.out.println(newPosition.getColumn() + "," + newPosition.getRow());
-                targetBlock.position = newPosition;
-                this.position = originalPosition;
+                Board currentBoard = adapter.getBoard();
+                currentBoard.moveBlock(originalPosition, newPosition);
 
-                setPosition(targetBlock.blockImageView, targetBlock.position);
+
+                this.position = newPosition;
                 setPosition(this.blockImageView, this.position);
+
+                NodeBlock targetBlock = (NodeBlock) event.getGestureSource();
+                if (targetBlock != null) {
+                    targetBlock.position = originalPosition;
+                    setPosition(targetBlock.blockImageView, targetBlock.position);
+                }
+
+                success = true;
+                currentBoard.resetLasers();
             }
 
             event.setDropCompleted(success);
             event.consume();
 
             System.out.println("Dropped to: " + this.position.getRow() + ", " + this.position.getColumn());
+            adapter.moveLasers();
+
         });
 
+
     }
-
-
 
     private void setPosition(ImageView imageView, Position position) {
         imageView.setLayoutX(position.getColumn()*58);
