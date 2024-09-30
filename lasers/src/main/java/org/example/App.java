@@ -48,7 +48,7 @@ public class App extends Application {
 //        Pane currentBoard = comunicator.getCurrentBoard();
 //        currentBoard.getOnDragDetected(EventHandler<MouseEvent> currentBoard.makeMove());
 
-        stage.setResizable(false);
+        stage.setResizable(true);
         stage.setScene(scene);
         stage.setTitle("Lasers");
 

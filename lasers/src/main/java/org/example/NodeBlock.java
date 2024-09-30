@@ -29,10 +29,17 @@ public class NodeBlock extends Pane {
         setOnDragDetected((MouseEvent event) -> {
             Dragboard db = startDragAndDrop(TransferMode.MOVE);
             ClipboardContent content = new ClipboardContent();
-            System.out.println(event.getX());
-            System.out.println(event.getY());
             content.putString(position.getRow() + "," + position.getColumn());
             db.setContent(content);
+            event.consume();
+
+            System.out.println("Dragging from: " + position.getRow() + ", " + position.getColumn());
+        });
+
+        setOnDragOver((DragEvent event) -> {
+            if (event.getGestureSource() != this && event.getDragboard().hasString()) {
+                event.acceptTransferModes(TransferMode.MOVE);
+            }
             event.consume();
         });
 
@@ -41,25 +48,35 @@ public class NodeBlock extends Pane {
             boolean success = false;
             if (db.hasString()) {
                 String[] positions = db.getString().split(",");
-                Position newPos = new Position(Integer.parseInt(positions[0]), Integer.parseInt(positions[1]));
-                success = handleMove(newPos);
-                if (success) {
-                    position = newPos;
-                    setPosition(blockImageView, position);
-                }
-                event.setDropCompleted(success);
+                Position originalPosition = new Position(
+                        Integer.parseInt(positions[0]),
+                        Integer.parseInt(positions[1])
+                );
+
+                NodeBlock targetBlock = (NodeBlock) event.getGestureSource();
+
+                Position newPosition = new Position((int)(blockImageView.getLayoutY() / 58), (int)(blockImageView.getLayoutX() / 58)); // TODO: get multiplier from parameter.
+                System.out.println(newPosition.getColumn() + "," + newPosition.getRow());
+                targetBlock.position = newPosition;
+                this.position = originalPosition;
+
+                setPosition(targetBlock.blockImageView, targetBlock.position);
+                setPosition(this.blockImageView, this.position);
             }
+
+            event.setDropCompleted(success);
             event.consume();
+
+            System.out.println("Dropped to: " + this.position.getRow() + ", " + this.position.getColumn());
         });
+
     }
 
-    public boolean handleMove(Position newPos) {
-        return true;
-    }
+
 
     private void setPosition(ImageView imageView, Position position) {
-        imageView.setLayoutX(position.getColumn() * 58);
-        imageView.setLayoutY(position.getRow() * 58);
+        imageView.setLayoutX(position.getColumn()*58);
+        imageView.setLayoutY(position.getRow()*58);
     }
 
     public Position getPosition() {

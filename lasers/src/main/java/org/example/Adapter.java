@@ -124,13 +124,21 @@ public class Adapter {
         mainArea.getChildren().add(pane);
     }
 
+
     private void updateBlocks(Pane pane, Map<Position, Block> blocks) {
+        pane.getChildren().clear();
+
         blocks.forEach((position, block) -> {
             Image image = getElementImage(block.getType().name().toLowerCase());
             NodeBlock currentBlock = new NodeBlock(block, position, image);
+
+            System.out.println("Adding block at: " + position.getRow() + ", " + position.getColumn());
+
             pane.getChildren().add(currentBlock);
         });
     }
+
+
 
     private void updateLasers(Pane pane, Map<Pair, Laser> primitive, Map<Pair, Laser> lasers) {
         primitive.forEach((pair, laser) -> {
@@ -145,7 +153,6 @@ public class Adapter {
             pane.getChildren().add(laserImageView);
         });
     }
-
     private void updateObjectives(Pane pane, Map<Position, Objective> objectives) {
         objectives.forEach((position, objective) -> {
             ImageView objectiveImageView = new ImageView(getElementImage("objective"));
