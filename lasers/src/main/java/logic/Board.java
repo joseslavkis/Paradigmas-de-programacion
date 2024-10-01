@@ -52,18 +52,12 @@ public class Board implements Observable<String> {
         Block block1 = blocks.get(from);
         Block block2 = blocks.get(to);
 
-        if (block1.getType() == BlockType.NOT || block1.getType() == BlockType.EMPTY) {
-            return;
-        }
+        if (block1.getType() == BlockType.NOT || block2.getType() == BlockType.NOT) return;
 
-        if (block2.getType() == BlockType.NOT) {
-            return;
-        }
         blocks.put(from, block2);
         blocks.put(to, block1);
 
         String event = "Moved block from " + from.toString() + " to " + to.toString();
-
         listeners.forEach(listener -> listener.notifyChanges(event));
 
     }
@@ -165,6 +159,7 @@ public class Board implements Observable<String> {
         Laser laser = new Laser(pair.getDirection());
         auxMap.put(pair, laser);
     }
+
     private void applyCrystalEffect(DisplacementApplier applier, Laser newLaser, Position newPosition, Block currentBlock, Side blockSide, Map<Pair, Laser> auxMap) {
         Pair pairExited = currentBlock.applyEffect(newLaser, newPosition, blockSide);
         Laser laserExited = new Laser(pairExited.getDirection());

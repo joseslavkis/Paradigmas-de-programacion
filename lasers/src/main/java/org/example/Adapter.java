@@ -29,7 +29,6 @@ public class Adapter {
     private final VBox mainArea;
     private Board board;
     private final HashMap<String, String> imagePathMap = new HashMap<>();
-
     {
         imagePathMap.put("objective", "objectives/objective.png");
         imagePathMap.put("impacted", "objectives/impacted_objective.png");
@@ -76,6 +75,7 @@ public class Adapter {
         }
         return levelsBox;
     }
+
     public Board getBoard() {
         return board;
     }
@@ -92,7 +92,7 @@ public class Adapter {
             int col = fileLoader.getColumnCount(filePath);
 
             this.board = new Board(row, col, blocks, objectives, lasers, primitiveLasers);
-            updateMainArea(blocks, objectives, primitiveLasers, lasers, row, col);
+            updateMainArea();
             moveLasers();
         } catch (FileNotFoundException e) {
             showError("Unexpected error: " + e.getMessage());
@@ -111,51 +111,48 @@ public class Adapter {
         System.err.println(message);
     }
 
-    private void updateMainArea(Map<Position, Block> blocks, Map<Position, Objective> objectives,
-                                Map<Pair, Laser> primitive, Map<Pair, Laser> lasers, int row, int col) {
+    private void updateMainArea() {
+
         mainArea.getChildren().clear();
         mainArea.setAlignment(Pos.TOP_CENTER);
 
         Pane pane = new Pane();
-        pane.setPrefSize(col * multiplier, row * multiplier);
-        pane.setPadding(new Insets(10));
+        pane.setPrefSize(board.getColumn()*multiplier, board.getRow()*multiplier);
+        pane.setPadding(new Insets(100));
 
-        updateBlocks(pane, blocks);
-        updateObjectives(pane, objectives);
-        updateLasers(pane, primitive, lasers);
-
+        updateBlocks(pane);
+        updateObjectives(pane);
+        updateLasers(pane);
         mainArea.getChildren().add(pane);
     }
 
+    private void updateBlocks(Pane pane) {
 
-    private void updateBlocks(Pane pane, Map<Position, Block> blocks) {
-        pane.getChildren().clear();
-
-        blocks.forEach((position, block) -> {
+        board.getBlocks().forEach((position, block) -> {
             Image image = getElementImage(block.getType().name().toLowerCase());
-            NodeBlock currentBlock = new NodeBlock(block, position, image, this);
-
+            NodeBlock currentBlock = new NodeBlock(position, image, this);
             pane.getChildren().add(currentBlock);
         });
+
+        System.out.println(board.getBlocks().size());
     }
 
-
-
-    private void updateLasers(Pane pane, Map<Pair, Laser> primitive, Map<Pair, Laser> lasers) {
-        primitive.forEach((pair, laser) -> {
+    private void updateLasers(Pane pane) {
+        board.getPrimitiveLasers().forEach((pair, laser) -> {
             ImageView primitiveImageView = new ImageView(getElementImage("impacted"));
             setPosition(primitiveImageView, pair.getPosition());
             pane.getChildren().add(primitiveImageView);
         });
 
-        lasers.forEach((pair, laser) -> {
+        board.getLasers().forEach((pair, laser) -> {
             ImageView laserImageView = new ImageView(getElementImage(laser.getDirection().name().toLowerCase()));
             setPosition(laserImageView, pair.getPosition());
             pane.getChildren().add(laserImageView);
         });
     }
-    private void updateObjectives(Pane pane, Map<Position, Objective> objectives) {
-        objectives.forEach((position, objective) -> {
+
+    private void updateObjectives(Pane pane) {
+        board.getObjectives().forEach((position, objective) -> {
             ImageView objectiveImageView = new ImageView(getElementImage("objective"));
             setPosition(objectiveImageView, position);
             pane.getChildren().add(objectiveImageView);
@@ -189,7 +186,7 @@ public class Adapter {
                 board.moveAllLaser();
                 i++;
             }
-            updateMainArea(board.getBlocks(), board.getObjectives(), board.getPrimitiveLasers(), board.getLasers(), board.getRow(), board.getColumn());
+            updateMainArea();
         }
     }
 

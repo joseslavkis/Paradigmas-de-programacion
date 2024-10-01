@@ -7,6 +7,7 @@ import logic.blocks.Side;
 public class Position implements Comparable<Position> {
     private int row;
     private int column;
+
     private static final Map<Direction, Position> movementMap = Map.of(
             Direction.SE, new Position(1, 1),
             Direction.SW, new Position(1, -1),
@@ -85,4 +86,13 @@ public class Position implements Comparable<Position> {
         }
         return Integer.compare(this.column, o.column);
     }
+
+    @Override
+    public String toString() {
+        return "Position{" +
+                "row=" + row +
+                ", column=" + column +
+                '}';
+    }
+
 }

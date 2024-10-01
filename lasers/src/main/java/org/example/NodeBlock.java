@@ -1,31 +1,30 @@
 package org.example;
 
+import javafx.scene.Node;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.ClipboardContent;
-import javafx.scene.input.Dragboard;
-import javafx.scene.input.TransferMode;
+import javafx.scene.input.*;
 import javafx.scene.layout.Pane;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.input.DragEvent;
 import logic.Board;
+import logic.Objective;
 import logic.Position;
 import logic.blocks.Block;
 
+import java.util.Map;
+import java.util.Objects;
+
 public class NodeBlock extends Pane {
-    private final Block block;
     private Position position;
     private final ImageView blockImageView;
     private final Adapter adapter;
 
-    public NodeBlock(Block block, Position position, Image image, Adapter adapter) {
-        this.block = block;
+    public NodeBlock(Position position, Image image, Adapter adapter) {
         this.position = position;
         this.blockImageView = new ImageView(image);
         this.adapter = adapter;
         getChildren().add(blockImageView);
-        setupDragAndDrop();
         setPosition(blockImageView, position);
+        setupDragAndDrop();
     }
 
     private void setupDragAndDrop() {
@@ -35,12 +34,11 @@ public class NodeBlock extends Pane {
             content.putString(position.getRow() + "," + position.getColumn());
             db.setContent(content);
             event.consume();
-
             System.out.println("Dragging from: " + position.getRow() + ", " + position.getColumn());
         });
 
         setOnDragOver((DragEvent event) -> {
-            if (event.getGestureSource() != this && event.getDragboard().hasString()) {
+            if (event.getGestureSource() != this.position && event.getDragboard().hasString()) {
                 event.acceptTransferModes(TransferMode.MOVE);
             }
             event.consume();
@@ -51,6 +49,7 @@ public class NodeBlock extends Pane {
             boolean success = false;
             if (db.hasString()) {
                 String[] positions = db.getString().split(",");
+                System.out.println("fil: " + positions[0] + ", " + "col: " + positions[1]);
                 Position originalPosition = new Position(
                         Integer.parseInt(positions[0]),
                         Integer.parseInt(positions[1])
@@ -61,33 +60,29 @@ public class NodeBlock extends Pane {
                 Board currentBoard = adapter.getBoard();
                 currentBoard.moveBlock(originalPosition, newPosition);
 
-
                 this.position = newPosition;
                 setPosition(this.blockImageView, this.position);
 
                 NodeBlock targetBlock = (NodeBlock) event.getGestureSource();
-                if (targetBlock != null) {
-                    targetBlock.position = originalPosition;
-                    setPosition(targetBlock.blockImageView, targetBlock.position);
-                }
+
+                targetBlock.position = originalPosition;
+                setPosition(targetBlock.blockImageView, targetBlock.position);
 
                 success = true;
                 currentBoard.resetLasers();
             }
 
             event.setDropCompleted(success);
+            adapter.moveLasers();
             event.consume();
 
             System.out.println("Dropped to: " + this.position.getRow() + ", " + this.position.getColumn());
-            adapter.moveLasers();
 
         });
-
-
     }
 
     private void setPosition(ImageView imageView, Position position) {
-        imageView.setLayoutX(position.getColumn()*58);
+        imageView.setLayoutX(position.getColumn()*58); // TODO: Multiplier
         imageView.setLayoutY(position.getRow()*58);
     }
 
@@ -95,7 +90,4 @@ public class NodeBlock extends Pane {
         return position;
     }
 
-    public Block getBlock() {
-        return block;
-    }
 }

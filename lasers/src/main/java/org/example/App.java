@@ -32,7 +32,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class App extends Application {
-
     private Scene scene;
 
     public static void main(String[] args) {
@@ -42,11 +41,7 @@ public class App extends Application {
     @Override
     public void start(Stage stage) {
         stage.setTitle("Game Levels");
-        Adapter comunicator = new Adapter(new VBox(), 58);
-        Scene scene = comunicator.setGUI();
-
-//        Pane currentBoard = comunicator.getCurrentBoard();
-//        currentBoard.getOnDragDetected(EventHandler<MouseEvent> currentBoard.makeMove());
+        Scene scene = new Adapter(new VBox(), 58).setGUI();
 
         stage.setResizable(true);
         stage.setScene(scene);
