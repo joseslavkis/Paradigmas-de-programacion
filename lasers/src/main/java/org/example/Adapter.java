@@ -143,13 +143,20 @@ public class Adapter {
         });
     }
 
-    private void updateLasers(Pane overlayPane) {
+    private void updateLasers(Pane pane) {
+        board.getPrimitiveLasers().forEach((pair, laser) -> {
+            ImageView primitiveImageView = new ImageView(getElementImage("impacted"));
+            setPosition(primitiveImageView, pair.getPosition());
+            pane.getChildren().add(primitiveImageView);
+        });
+
         board.getLasers().forEach((pair, laser) -> {
             ImageView laserImageView = new ImageView(getElementImage(laser.getDirection().name().toLowerCase()));
             setPosition(laserImageView, pair.getPosition());
-            overlayPane.getChildren().add(laserImageView);
+            pane.getChildren().add(laserImageView);
         });
     }
+
 
     private void setPosition(ImageView imageView, Position position) {
         int x = position.getColumn() * multiplier;
