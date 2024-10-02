@@ -1,20 +1,12 @@
 package org.example;
 
-import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.ClipboardContent;
-import javafx.scene.input.Dragboard;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.input.TransferMode;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import logic.*;
 import logic.blocks.Block;
 
@@ -23,12 +15,14 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class Adapter {
     private final int multiplier;
     private final VBox mainArea;
     private Board board;
     private final HashMap<String, String> imagePathMap = new HashMap<>();
+
     {
         imagePathMap.put("objective", "objectives/objective.png");
         imagePathMap.put("impacted", "objectives/impacted_objective.png");
@@ -112,50 +106,48 @@ public class Adapter {
     }
 
     private void updateMainArea() {
-
         mainArea.getChildren().clear();
         mainArea.setAlignment(Pos.TOP_CENTER);
 
-        Pane pane = new Pane();
-        pane.setPrefSize(board.getColumn()*multiplier, board.getRow()*multiplier);
-        pane.setPadding(new Insets(100));
+        GridPane gridPane = new GridPane();
+        gridPane.setPadding(new Insets(10));
+        gridPane.setHgap(5);
+        gridPane.setVgap(5);
 
-        updateBlocks(pane);
-        updateObjectives(pane);
-        updateLasers(pane);
-        mainArea.getChildren().add(pane);
+        Pane overlayPane = new Pane();
+        overlayPane.setPickOnBounds(false);
+
+        updateBlocks(gridPane);
+        updateObjectives(overlayPane);
+        updateLasers(overlayPane);
+
+        StackPane stackPane = new StackPane();
+        stackPane.getChildren().addAll(gridPane, overlayPane);
+
+        mainArea.getChildren().add(stackPane);
     }
 
-    private void updateBlocks(Pane pane) {
-
+    private void updateBlocks(GridPane gridPane) {
         board.getBlocks().forEach((position, block) -> {
             Image image = getElementImage(block.getType().name().toLowerCase());
             NodeBlock currentBlock = new NodeBlock(position, image, this);
-            pane.getChildren().add(currentBlock);
-        });
-
-        System.out.println(board.getBlocks().size());
-    }
-
-    private void updateLasers(Pane pane) {
-        board.getPrimitiveLasers().forEach((pair, laser) -> {
-            ImageView primitiveImageView = new ImageView(getElementImage("impacted"));
-            setPosition(primitiveImageView, pair.getPosition());
-            pane.getChildren().add(primitiveImageView);
-        });
-
-        board.getLasers().forEach((pair, laser) -> {
-            ImageView laserImageView = new ImageView(getElementImage(laser.getDirection().name().toLowerCase()));
-            setPosition(laserImageView, pair.getPosition());
-            pane.getChildren().add(laserImageView);
+            gridPane.add(currentBlock, position.getColumn(), position.getRow());
         });
     }
 
-    private void updateObjectives(Pane pane) {
+    private void updateObjectives(Pane overlayPane) {
         board.getObjectives().forEach((position, objective) -> {
             ImageView objectiveImageView = new ImageView(getElementImage("objective"));
             setPosition(objectiveImageView, position);
-            pane.getChildren().add(objectiveImageView);
+            overlayPane.getChildren().add(objectiveImageView);
+        });
+    }
+
+    private void updateLasers(Pane overlayPane) {
+        board.getLasers().forEach((pair, laser) -> {
+            ImageView laserImageView = new ImageView(getElementImage(laser.getDirection().name().toLowerCase()));
+            setPosition(laserImageView, pair.getPosition());
+            overlayPane.getChildren().add(laserImageView);
         });
     }
 
@@ -167,12 +159,10 @@ public class Adapter {
     }
 
     private Image getElementImage(String request) {
+        if (Objects.equals(request, "static")) return null;
         String currentPathImage = imagePathMap.get(request);
         try (FileInputStream input = new FileInputStream("src/main/java/org/example/pngs/" + currentPathImage)) {
             return new Image(input);
-        } catch (FileNotFoundException e) {
-            showError("Unexpected error: " + e.getMessage());
-            return null;
         } catch (IOException e) {
             showError("Unexpected error: " + e.getMessage());
             return null;
@@ -189,5 +179,4 @@ public class Adapter {
             updateMainArea();
         }
     }
-
 }
