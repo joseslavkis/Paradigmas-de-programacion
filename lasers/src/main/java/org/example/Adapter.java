@@ -209,7 +209,6 @@ public class Adapter {
         }
     }
 
-    // Adapter.java
     private void disableCurrentLevelBlocks() {
         mainArea.getChildren().forEach(node -> {
             if (node instanceof StackPane) {
