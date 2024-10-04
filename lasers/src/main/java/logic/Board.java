@@ -53,13 +53,14 @@ public class Board implements Observable<String> {
         Block block2 = blocks.get(to);
 
         if (block1.getType() == BlockType.NOT || block2.getType() == BlockType.NOT) return;
+        if (block1.getType() == BlockType.FIXED_OPAQUE || block2.getType() == BlockType.FIXED_OPAQUE) return;
+        if (block1.getType() == BlockType.EMPTY) return;
 
         blocks.put(from, block2);
         blocks.put(to, block1);
 
         String event = "Moved block from " + from.toString() + " to " + to.toString();
         listeners.forEach(listener -> listener.notifyChanges(event));
-
     }
 
     public void moveAllLaser() {

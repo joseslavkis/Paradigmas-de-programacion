@@ -76,6 +76,8 @@ public class Adapter {
 
     private void loadLevel(int level) {
         try {
+            mainArea.setStyle("");
+
             String filePath = getLevelFilePath(level);
             FileLoader fileLoader = new FileLoader();
             Map<Position, Block> blocks = fileLoader.loadBlocks(filePath);
@@ -96,7 +98,6 @@ public class Adapter {
             showError("Unexpected error: " + e.getMessage());
         }
     }
-
     private String getLevelFilePath(int level) {
         return "src/main/java/org/example/levels/level" + level + ".dat";
     }
@@ -111,8 +112,8 @@ public class Adapter {
 
         GridPane gridPane = new GridPane();
         gridPane.setPadding(new Insets(10));
-        gridPane.setHgap(5);
-        gridPane.setVgap(5);
+        gridPane.setHgap(0); // Ajusta el espaciado horizontal
+        gridPane.setVgap(0); // Ajusta el espaciado vertical
 
         Pane overlayPane = new Pane();
         overlayPane.setPickOnBounds(false);
@@ -131,15 +132,23 @@ public class Adapter {
         board.getBlocks().forEach((position, block) -> {
             Image image = getElementImage(block.getType().name().toLowerCase());
             NodeBlock currentBlock = new NodeBlock(position, image, this);
+            GridPane.setRowIndex(currentBlock, position.getRow());
+            GridPane.setColumnIndex(currentBlock, position.getColumn());
             gridPane.add(currentBlock, position.getColumn(), position.getRow());
         });
     }
 
     private void updateObjectives(Pane overlayPane) {
+        Map<Pair, Laser> lasers = board.getLasers();
         board.getObjectives().forEach((position, objective) -> {
             ImageView objectiveImageView = new ImageView(getElementImage("objective"));
             setPosition(objectiveImageView, position);
             overlayPane.getChildren().add(objectiveImageView);
+            if (objective.isCrossed(lasers)) {
+                ImageView impactedImageView = new ImageView(getElementImage("impacted"));
+                setPosition(impactedImageView, position);
+                overlayPane.getChildren().add(impactedImageView);
+            }
         });
     }
 
@@ -156,7 +165,6 @@ public class Adapter {
             pane.getChildren().add(laserImageView);
         });
     }
-
 
     private void setPosition(ImageView imageView, Position position) {
         int x = position.getColumn() * multiplier;
@@ -184,6 +192,33 @@ public class Adapter {
                 i++;
             }
             updateMainArea();
+            checkGameEnd();
         }
+    }
+
+    private void checkGameEnd() {
+        if (board.isWin()) {
+            disableCurrentLevelBlocks();
+            mainArea.setStyle("-fx-background-color: #90ED50;"); // Light green color
+            showError("Level completed! All objectives are impacted by lasers.");
+        }
+    }
+
+    private void disableCurrentLevelBlocks() {
+        mainArea.getChildren().forEach(node -> {
+            if (node instanceof StackPane) {
+                StackPane stackPane = (StackPane) node;
+                stackPane.getChildren().forEach(child -> {
+                    if (child instanceof GridPane) {
+                        GridPane gridPane = (GridPane) child;
+                        gridPane.getChildren().forEach(block -> {
+                            if (block instanceof NodeBlock) {
+                                block.setDisable(true);
+                            }
+                        });
+                    }
+                });
+            }
+        });
     }
 }
