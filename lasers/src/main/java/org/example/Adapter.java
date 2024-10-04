@@ -106,36 +106,41 @@ public class Adapter {
         System.err.println(message);
     }
 
+    // Adapter.java
     private void updateMainArea() {
         mainArea.getChildren().clear();
         mainArea.setAlignment(Pos.TOP_CENTER);
 
-        GridPane gridPane = new GridPane();
-        gridPane.setPadding(new Insets(10));
-        gridPane.setHgap(0); // Ajusta el espaciado horizontal
-        gridPane.setVgap(0); // Ajusta el espaciado vertical
+        Pane pane = new Pane();
+        pane.setPadding(new Insets(10));
 
         Pane overlayPane = new Pane();
         overlayPane.setPickOnBounds(false);
 
-        updateBlocks(gridPane);
+        updateBlocks(pane);
         updateObjectives(overlayPane);
         updateLasers(overlayPane);
 
         StackPane stackPane = new StackPane();
-        stackPane.getChildren().addAll(gridPane, overlayPane);
+        stackPane.getChildren().addAll(pane, overlayPane);
 
         mainArea.getChildren().add(stackPane);
     }
 
-    private void updateBlocks(GridPane gridPane) {
+    private void updateBlocks(Pane pane) {
         board.getBlocks().forEach((position, block) -> {
             Image image = getElementImage(block.getType().name().toLowerCase());
             NodeBlock currentBlock = new NodeBlock(position, image, this);
-            GridPane.setRowIndex(currentBlock, position.getRow());
-            GridPane.setColumnIndex(currentBlock, position.getColumn());
-            gridPane.add(currentBlock, position.getColumn(), position.getRow());
+            setPosition(currentBlock, position);
+            pane.getChildren().add(currentBlock);
         });
+    }
+
+    private void setPosition(NodeBlock block, Position position) {
+        int x = position.getColumn() * multiplier;
+        int y = position.getRow() * multiplier;
+        block.setLayoutX(x);
+        block.setLayoutY(y);
     }
 
     private void updateObjectives(Pane overlayPane) {
@@ -220,5 +225,9 @@ public class Adapter {
                 });
             }
         });
+    }
+
+    public double getMultiplier() {
+        return multiplier;
     }
 }

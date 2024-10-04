@@ -3,7 +3,6 @@ package org.example;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.*;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import logic.Board;
 import logic.Position;
@@ -48,8 +47,8 @@ public class NodeBlock extends Pane {
                 );
 
                 Position newPosition = new Position(
-                        GridPane.getRowIndex(this),
-                        GridPane.getColumnIndex(this)
+                        (int) (getLayoutY() / adapter.getMultiplier()),
+                        (int) (getLayoutX() / adapter.getMultiplier())
                 );
 
                 Board currentBoard = adapter.getBoard();
