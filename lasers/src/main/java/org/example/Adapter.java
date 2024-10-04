@@ -209,14 +209,15 @@ public class Adapter {
         }
     }
 
+    // Adapter.java
     private void disableCurrentLevelBlocks() {
         mainArea.getChildren().forEach(node -> {
             if (node instanceof StackPane) {
                 StackPane stackPane = (StackPane) node;
                 stackPane.getChildren().forEach(child -> {
-                    if (child instanceof GridPane) {
-                        GridPane gridPane = (GridPane) child;
-                        gridPane.getChildren().forEach(block -> {
+                    if (child instanceof Pane) {
+                        Pane pane = (Pane) child;
+                        pane.getChildren().forEach(block -> {
                             if (block instanceof NodeBlock) {
                                 block.setDisable(true);
                             }
