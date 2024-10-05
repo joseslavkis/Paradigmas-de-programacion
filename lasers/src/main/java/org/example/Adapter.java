@@ -33,10 +33,10 @@ public class Adapter {
         imagePathMap.put("not", "blocks/not_block.png");
         imagePathMap.put("fixed_opaque", "blocks/fixed_opaque_block.png");
         imagePathMap.put("mobile_opaque", "blocks/mobile_opaque_block.png");
-        imagePathMap.put("n", "lasers/laser_n.png");
+        imagePathMap.put("n", "lasers/laser_s.png");
         imagePathMap.put("e", "lasers/laser_e.png");
         imagePathMap.put("w", "lasers/laser_w.png");
-        imagePathMap.put("s", "lasers/laser_s.png");
+        imagePathMap.put("s", "lasers/laser_n.png");
         imagePathMap.put("ne", "lasers/laser_ne.png");
         imagePathMap.put("nw", "lasers/laser_nw.png");
         imagePathMap.put("se", "lasers/laser_se.png");

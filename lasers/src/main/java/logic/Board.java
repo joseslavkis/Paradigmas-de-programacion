@@ -167,12 +167,13 @@ public class Board implements Observable<String> {
         Direction directionExited = laserExited.getDirection();
 
         Direction newDirection = applier.getCrystalDirection(blockSide);
-        if (auxMap.containsKey(pairExited)) return;
         newLaser.setDirection(newDirection);
 
         auxMap.put(pairExited, laserExited);
         Pair newPair = new Pair(newPosition, newDirection);
-        if (auxMap.containsKey(newPair)) return;
-        auxMap.put(newPair, newLaser);
+
+        if (!auxMap.containsKey(newPair)) {
+            auxMap.put(newPair, newLaser);
+        }
     }
 }
