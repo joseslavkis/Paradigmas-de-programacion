@@ -1,35 +1,10 @@
 package org.example;
 
 import javafx.application.Application;
-import javafx.beans.property.ObjectProperty;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Labeled;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.input.*;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import logic.*;
-import logic.blocks.Block;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 public class App extends Application {
     private Scene scene;
@@ -43,7 +18,7 @@ public class App extends Application {
         stage.setTitle("Game Levels");
         Scene scene = new Adapter(new VBox(), 58).setGUI();
 
-        stage.setResizable(true);
+        stage.setResizable(false);
         stage.setScene(scene);
         stage.setTitle("Lasers");
 

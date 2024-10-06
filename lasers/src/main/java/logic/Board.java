@@ -4,19 +4,16 @@ import logic.blocks.Block;
 import logic.blocks.BlockType;
 import logic.blocks.EmptyBlock;
 import logic.blocks.Side;
-import org.example.Listener;
-import org.example.Observable;
 
 import java.util.*;
 
-public class Board implements Observable<String> {
+public class Board {
     private final Map<Position, Block> blocks;
     private final Map<Position, Objective> objectives;
     private Map<Pair, Laser> lasers;
     private final Map<Pair, Laser> primitiveLasers;
     private final int row;
     private final int column;
-    private final List<Listener<String>> listeners = new ArrayList<>();
 
     public Board(int row, int column, Map<Position, Block> blocks, Map<Position, Objective> objectives, Map<Pair, Laser> laser, Map<Pair, Laser> primitiveLasers) {
         this.blocks = blocks;
@@ -43,11 +40,6 @@ public class Board implements Observable<String> {
         this.lasers = new HashMap<>(primitiveLasers);
     }
 
-    @Override
-    public void addListener(Listener<String> listener) {
-        listeners.add(listener);
-    }
-
     public void moveBlock(Position from, Position to) {
         Block block1 = blocks.get(from);
         Block block2 = blocks.get(to);
@@ -58,9 +50,6 @@ public class Board implements Observable<String> {
 
         blocks.put(from, block2);
         blocks.put(to, block1);
-
-        String event = "Moved block from " + from.toString() + " to " + to.toString();
-        listeners.forEach(listener -> listener.notifyChanges(event));
     }
 
     public void moveAllLaser() {
