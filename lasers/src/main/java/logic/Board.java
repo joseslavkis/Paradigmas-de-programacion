@@ -60,35 +60,7 @@ public class Board {
             if (currentLaser.getDirection() == Direction.STATIC) continue;
             Position currentLaserPosition = positionLaserEntry.getKey().getPosition();
 
-            Map<Direction, Position> movementMap = currentLaserPosition.getMovementMap();
-            DisplacementApplier applier = new DisplacementApplier(movementMap);
-
-            Position newPosition = currentLaserPosition.rePosition(currentLaser, currentLaserPosition, applier, row, column);
-            if (newPosition == null) continue;
-
-            Laser newLaser = new Laser(currentLaser.getDirection());
-
-            Side blockSide = currentLaser.getBlockSide(currentLaserPosition);
-            if (blockSide == null) continue;
-
-            Position currentBlockPosition = currentLaserPosition.getBorder(newPosition, blockSide);
-            Block currentBlock = blocks.get(currentBlockPosition);
-
-            if (isCurrentBlockNull(currentBlock, newPosition, newLaser, auxMap)) continue;
-
-            switch (currentBlock.getType()) {
-                case GLASS:
-                    applyGlassEffect(newLaser, newPosition, currentBlock, blockSide, auxMap);
-                    break;
-
-                case CRYSTAL:
-                    applyCrystalEffect(applier, newLaser, newPosition, currentBlock, blockSide, auxMap);
-                    break;
-
-                default:
-                    applyGenericEffect(newLaser, newPosition, currentBlock, blockSide, auxMap);
-                    break;
-            }
+            moveLaser(currentLaser, currentLaserPosition, auxMap);
         }
         lasers.putAll(auxMap);
     }
@@ -163,6 +135,42 @@ public class Board {
 
         if (!auxMap.containsKey(newPair)) {
             auxMap.put(newPair, newLaser);
+        }
+    }
+
+    private void moveLaser(Laser currentLaser, Position currentLaserPosition, Map<Pair, Laser> auxMap) {
+        Map<Direction, Position> movementMap = currentLaserPosition.getMovementMap();
+        DisplacementApplier applier = new DisplacementApplier(movementMap);
+
+        Position newPosition = currentLaserPosition.rePosition(currentLaser, currentLaserPosition, applier, row, column);
+        if (newPosition == null) return;
+
+        Laser newLaser = new Laser(currentLaser.getDirection());
+
+        Side blockSide = currentLaser.getBlockSide(currentLaserPosition);
+        if (blockSide == null) return;
+
+        Position currentBlockPosition = currentLaserPosition.getBorder(newPosition, blockSide);
+        Block currentBlock = blocks.get(currentBlockPosition);
+
+        if (isCurrentBlockNull(currentBlock, newPosition, newLaser, auxMap)) return;
+
+        applyBlockEffect(currentBlock, newLaser, newPosition, blockSide, auxMap, applier);
+    }
+
+    private void applyBlockEffect(Block currentBlock, Laser newLaser, Position newPosition, Side blockSide, Map<Pair, Laser> auxMap, DisplacementApplier applier) {
+        switch (currentBlock.getType()) {
+            case GLASS:
+                applyGlassEffect(newLaser, newPosition, currentBlock, blockSide, auxMap);
+                break;
+
+            case CRYSTAL:
+                applyCrystalEffect(applier, newLaser, newPosition, currentBlock, blockSide, auxMap);
+                break;
+
+            default:
+                applyGenericEffect(newLaser, newPosition, currentBlock, blockSide, auxMap);
+                break;
         }
     }
 }

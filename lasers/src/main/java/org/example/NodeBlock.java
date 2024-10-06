@@ -21,48 +21,52 @@ public class NodeBlock extends Pane {
     }
 
     private void setupDragAndDrop() {
-        setOnDragDetected((MouseEvent event) -> {
-            Dragboard db = startDragAndDrop(TransferMode.MOVE);
-            ClipboardContent content = new ClipboardContent();
-            content.putString(position.getRow() + "," + position.getColumn());
-            db.setContent(content);
-            event.consume();
-        });
+        setOnDragDetected(this::handleDragDetected);
+        setOnDragOver(this::handleDragOver);
+        setOnDragDropped(this::handleDragDropped);
+    }
 
-        setOnDragOver((DragEvent event) -> {
-            if (event.getGestureSource() != this && event.getDragboard().hasString()) {
-                event.acceptTransferModes(TransferMode.MOVE);
-            }
-            event.consume();
-        });
+    private void handleDragDetected(MouseEvent event) {
+        Dragboard db = startDragAndDrop(TransferMode.MOVE);
+        ClipboardContent content = new ClipboardContent();
+        content.putString(position.getRow() + "," + position.getColumn());
+        db.setContent(content);
+        event.consume();
+    }
 
-        setOnDragDropped((DragEvent event) -> {
-            Dragboard db = event.getDragboard();
-            boolean success = false;
-            if (db.hasString()) {
-                String[] positions = db.getString().split(",");
-                Position originalPosition = new Position(
-                        Integer.parseInt(positions[0]),
-                        Integer.parseInt(positions[1])
-                );
+    private void handleDragOver(DragEvent event) {
+        if (event.getGestureSource() != this && event.getDragboard().hasString()) {
+            event.acceptTransferModes(TransferMode.MOVE);
+        }
+        event.consume();
+    }
 
-                Position newPosition = new Position(
-                        (int) (getLayoutY() / adapter.getMultiplier()),
-                        (int) (getLayoutX() / adapter.getMultiplier())
-                );
+    private void handleDragDropped(DragEvent event) {
+        Dragboard db = event.getDragboard();
+        boolean success = false;
+        if (db.hasString()) {
+            String[] positions = db.getString().split(",");
+            Position originalPosition = new Position(
+                    Integer.parseInt(positions[0]),
+                    Integer.parseInt(positions[1])
+            );
 
-                Board currentBoard = adapter.getBoard();
-                currentBoard.moveBlock(originalPosition, newPosition);
+            Position newPosition = new Position(
+                    (int) (getLayoutY() / adapter.getMultiplier()),
+                    (int) (getLayoutX() / adapter.getMultiplier())
+            );
 
-                this.position = newPosition;
-                success = true;
-                currentBoard.resetLasers();
-            }
+            Board currentBoard = adapter.getBoard();
+            currentBoard.moveBlock(originalPosition, newPosition);
 
-            event.setDropCompleted(success);
-            adapter.moveLasers();
-            event.consume();
-        });
+            this.position = newPosition;
+            success = true;
+            currentBoard.resetLasers();
+        }
+
+        event.setDropCompleted(success);
+        adapter.moveLasers();
+        event.consume();
     }
 
     public Position getPosition() {
