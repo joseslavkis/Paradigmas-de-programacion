@@ -22,6 +22,16 @@ class Board {
 -moveLaser(Position from, Position to)
 }
 
+enum BlockType {
+    MIRROR
+    GLASS
+    CRYSTAL
+    NOT
+    EMPTY
+    FIXED_OPAQUE
+    MOBILE_OPAQUE
+}
+
 class Objective {
     - Position position;
     + getPosition()
@@ -43,12 +53,25 @@ interface Block {
     + void applyEffect()
 }
 
+class Pair {
+    Position position
+    Direction direction
+}
 
+enum Side {
+    LEFT
+    RIGHT
+    UPPER
+    LOWER
+}
 
-Board o-- Objective
-Board o-- Laser
-Board o-- Block
-Board <-- Position
+Pair o-- Position
+Pair o-- Direction
+Board --> Pair
+Board *-- Objective
+Board *-- Laser
+Board *-- Block
+Board --> Position
 
 MirrorBlock ..|> Block
 CrystalBlock ..|> Block
@@ -57,14 +80,14 @@ GlassBlock ..|> Block
 MobileOpaqueBlock ..|> Block
 FixedOpaqueBlock ..|> Block
 NotBlock ..|> Block
-
+MirrorBlock ..> Pair
 Position <-- Laser
 Position <-- Objective
 
 Direction <-- Laser
 
 Laser --> Block
-
+Block ..> BlockType
 MirrorBlock --> DisplacementAppiler
 CrystalBlock --> DisplacementAppiler
 EmptyBlock --> DisplacementAppiler
@@ -72,5 +95,12 @@ GlassBlock --> DisplacementAppiler
 MobileOpaqueBlock --> DisplacementAppiler
 FixedOpaqueBlock --> DisplacementAppiler
 NotBlock --> DisplacementAppiler
+Block ..> Laser
+Laser ..> Side
+Board ..> Side
+Block ..> Side
+DisplacementAppiler ..> Side
+DisplacementAppiler --> Position
+DisplacementAppiler --> Direction
 
 @enduml
