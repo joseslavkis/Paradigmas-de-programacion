@@ -10,16 +10,22 @@ enum Direction {
     SOUTH_WEST
     NORTH_EAST
     NORTH_WEST
+    NORTH
+    SOUTH
+    WEST
+    EAST
+    STATIC
 }
 
 class Board {
-- Map<Position, Block> blocks;
-- Map<Position, Objective> objectives;
-- Map<Position, Laser> lasers;
-- int row;
-- int column;
--moveBlock(Position from, Position to)
--moveLaser(Position from, Position to)
+    - Map<Position, Block> blocks;
+    - Map<Position, Objective> objectives;
+    - Map<Pair, Laser> lasers;
+    - Map<Pair, Laser> primitiveLasers;
+    - int row;
+    - int column;
+    -moveBlock(Position from, Position to)
+    -moveLaser(Position from, Position to)
 }
 
 enum BlockType {
@@ -54,8 +60,8 @@ interface Block {
 }
 
 class Pair {
-    Position position
-    Direction direction
+    - Position position
+    - Direction direction
 }
 
 enum Side {
