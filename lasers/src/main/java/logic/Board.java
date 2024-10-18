@@ -1,9 +1,6 @@
 package logic;
 
-import logic.blocks.Block;
-import logic.blocks.BlockType;
-import logic.blocks.EmptyBlock;
-import logic.blocks.Side;
+import logic.blocks.*;
 
 import java.util.*;
 
@@ -104,10 +101,10 @@ public class Board {
         }
         return false;
     }
-    private void applyGlassEffect(Laser newLaser, Position newPosition, Block currentBlock, Side blockSide, Map<Pair, Laser> auxMap) {
+    private void applyGlassEffect(Laser newLaser, Position newPosition, Block currentBlock, SideType blockSideType, Map<Pair, Laser> auxMap) {
         Block emptyBlock = new EmptyBlock();
-        Pair pair1 = emptyBlock.applyEffect(newLaser, newPosition, blockSide);
-        Pair pair2 = currentBlock.applyEffect(newLaser, newPosition, blockSide);
+        Pair pair1 = emptyBlock.applyEffect(newLaser, newPosition, new Side(blockSideType));
+        Pair pair2 = currentBlock.applyEffect(newLaser, newPosition, new Side(blockSideType));
         Laser laser1 = new Laser(pair1.getDirection());
         Laser laser2 = new Laser(pair2.getDirection());
 
@@ -116,18 +113,18 @@ public class Board {
         auxMap.put(pair2, laser2);
     }
 
-    private void applyGenericEffect(Laser newLaser, Position newPosition, Block currentBlock, Side blockSide, Map<Pair, Laser> auxMap) {
-        Pair pair = currentBlock.applyEffect(newLaser, newPosition, blockSide);
+    private void applyGenericEffect(Laser newLaser, Position newPosition, Block currentBlock, SideType blockSideType, Map<Pair, Laser> auxMap) {
+        Pair pair = currentBlock.applyEffect(newLaser, newPosition, new Side(blockSideType));
         Laser laser = new Laser(pair.getDirection());
         auxMap.put(pair, laser);
     }
 
-    private void applyCrystalEffect(DisplacementApplier applier, Laser newLaser, Position newPosition, Block currentBlock, Side blockSide, Map<Pair, Laser> auxMap) {
-        Pair pairExited = currentBlock.applyEffect(newLaser, newPosition, blockSide);
+    private void applyCrystalEffect(DisplacementApplier applier, Laser newLaser, Position newPosition, Block currentBlock, SideType blockSideType, Map<Pair, Laser> auxMap) {
+        Pair pairExited = currentBlock.applyEffect(newLaser, newPosition, new Side(blockSideType));
         Laser laserExited = new Laser(pairExited.getDirection());
         Direction directionExited = laserExited.getDirection();
 
-        Direction newDirection = applier.getCrystalDirection(blockSide);
+        Direction newDirection = applier.getCrystalDirection(blockSideType);
         newLaser.setDirection(newDirection);
 
         auxMap.put(pairExited, laserExited);
@@ -147,29 +144,29 @@ public class Board {
 
         Laser newLaser = new Laser(currentLaser.getDirection());
 
-        Side blockSide = currentLaser.getBlockSide(currentLaserPosition);
-        if (blockSide == null) return;
+        SideType blockSideType = currentLaser.getBlockSide(currentLaserPosition);
+        if (blockSideType == null) return;
 
-        Position currentBlockPosition = currentLaserPosition.getBorder(newPosition, blockSide);
+        Position currentBlockPosition = currentLaserPosition.getBorder(newPosition, blockSideType);
         Block currentBlock = blocks.get(currentBlockPosition);
 
         if (isCurrentBlockNull(currentBlock, newPosition, newLaser, auxMap)) return;
 
-        applyBlockEffect(currentBlock, newLaser, newPosition, blockSide, auxMap, applier);
+        applyBlockEffect(currentBlock, newLaser, newPosition, blockSideType, auxMap, applier);
     }
 
-    private void applyBlockEffect(Block currentBlock, Laser newLaser, Position newPosition, Side blockSide, Map<Pair, Laser> auxMap, DisplacementApplier applier) {
+    private void applyBlockEffect(Block currentBlock, Laser newLaser, Position newPosition, SideType blockSideType, Map<Pair, Laser> auxMap, DisplacementApplier applier) {
         switch (currentBlock.getType()) {
             case GLASS:
-                applyGlassEffect(newLaser, newPosition, currentBlock, blockSide, auxMap);
+                applyGlassEffect(newLaser, newPosition, currentBlock, blockSideType, auxMap);
                 break;
 
             case CRYSTAL:
-                applyCrystalEffect(applier, newLaser, newPosition, currentBlock, blockSide, auxMap);
+                applyCrystalEffect(applier, newLaser, newPosition, currentBlock, blockSideType, auxMap);
                 break;
 
             default:
-                applyGenericEffect(newLaser, newPosition, currentBlock, blockSide, auxMap);
+                applyGenericEffect(newLaser, newPosition, currentBlock, blockSideType, auxMap);
                 break;
         }
     }

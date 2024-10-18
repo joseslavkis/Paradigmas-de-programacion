@@ -7,7 +7,6 @@ import logic.Position;
 public class NotBlock implements Block {
     @Override
     public Pair applyEffect(Laser laser, Position position, Side side) {
-        // Devuelve el láser siguiendo su camino (puedes ajustar esto según la lógica de tu aplicación)
         return new EmptyBlock().applyEffect(laser, position, side);
     }
 

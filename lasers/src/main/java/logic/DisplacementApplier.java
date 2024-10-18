@@ -1,6 +1,6 @@
 package logic;
 
-import logic.blocks.Side;
+import logic.blocks.SideType;
 import java.util.Map;
 
 public class DisplacementApplier {
@@ -18,14 +18,14 @@ public class DisplacementApplier {
         return new Position(from.getRow() + delta.getRow(), from.getColumn() + delta.getColumn());
     }
 
-    public Direction getCrystalDirection(Side side) {
-        Map<Side, Direction> positionMap = Map.of(
-                Side.LEFT, Direction.E,
-                Side.LOWER, Direction.N,
-                Side.RIGHT, Direction.W,
-                Side.UPPER, Direction.S
+    public Direction getCrystalDirection(SideType sideType) {
+        Map<SideType, Direction> positionMap = Map.of(
+                SideType.LEFT, Direction.E,
+                SideType.LOWER, Direction.N,
+                SideType.RIGHT, Direction.W,
+                SideType.UPPER, Direction.S
         );
-        return positionMap.get(side);
+        return positionMap.get(sideType);
     }
 }
 

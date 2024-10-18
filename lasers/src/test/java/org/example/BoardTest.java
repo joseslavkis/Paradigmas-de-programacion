@@ -22,8 +22,8 @@ public class BoardTest {
         Board board = new Board(5, 5, blocks, new HashMap<>(), new HashMap<>(), new HashMap<>());
         board.moveBlock(new Position(1, 1), new Position(1, 3));
 
-        Assert.assertTrue(board.getBlocks().get(new Position(1, 1)) instanceof MobileOpaqueBlock);
-        Assert.assertTrue(board.getBlocks().get(new Position(1, 3)) instanceof FixedOpaqueBlock);
+        Assert.assertTrue(board.getBlocks().get(new Position(1, 1)) instanceof FixedOpaqueBlock);
+        Assert.assertTrue(board.getBlocks().get(new Position(1, 3)) instanceof MobileOpaqueBlock);
     }
 
     @Test

@@ -1,5 +1,6 @@
 package org.example;
 
+import javafx.geometry.Pos;
 import logic.*;
 import logic.blocks.*;
 
@@ -10,52 +11,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class FileLoader {
-    public static final char SPACE = ' ';
-
-    public Map<Position, Block> loadBlocks(String filePath) throws IOException {
-        Map<Position, Block> blocks = new HashMap<>();
-        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
-            String line;
-            int row = 1;
-            while ((line = reader.readLine()) != null && !line.isEmpty()) {
-                int col = 1;
-                for (int i = 0; i < line.length(); i++) {
-                    char blockChar = line.charAt(i);
-                    Block block;
-                    switch (blockChar) {
-                        case SPACE:
-                            block = new NotBlock();
-                            break;
-                        case '.':
-                            block = new EmptyBlock();
-                            break;
-                        case 'F':
-                            block = new FixedOpaqueBlock();
-                            break;
-                        case 'B':
-                            block = new MobileOpaqueBlock();
-                            break;
-                        case 'R':
-                            block = new MirrorBlock();
-                            break;
-                        case 'G':
-                            block = new GlassBlock();
-                            break;
-                        case 'C':
-                            block = new CrystalBlock();
-                            break;
-                        default:
-                            throw new IllegalArgumentException("Invalid block character: " + blockChar);
-                    }
-                    Position center = new Position(row, col);
-                    blocks.put(center, block);
-                    col += 2; // Incrementar en 2 para mantener col impar
-                }
-                row += 2; // Incrementar en 2 para mantener row impar
-            }
-        }
-        return blocks;
-    }
+    private static final char SPACE = ' ';
+    private Map<Character, Block> converter = Map.of(
+        ' ', new NotBlock(),
+        '.', new EmptyBlock(),
+        'F', new FixedOpaqueBlock(),
+        'B', new MobileOpaqueBlock(),
+        'R', new MirrorBlock(),
+        'G', new GlassBlock(),
+        'C', new CrystalBlock()
+    );
 
     public int getRowCount(String filePath) throws IOException {
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
@@ -78,6 +43,52 @@ public class FileLoader {
         return 0;
     }
 
+    private Block generateBlock(int row, int column, Character blockChar, Map<Position, Block> blocks) {
+        try {
+            Block block = converter.get(blockChar);
+            Position center = new Position(row, column);
+            blocks.put(center, block);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Invalid block character: " + blockChar);
+        }
+    }
+
+    private Position generateCurrentPosition(String row, String column) {
+        return new Position(Integer.parseInt(row), Integer.parseInt(column));
+    }
+
+    private void generateLaser(String row, String column, String direction, Map<Pair, Laser> lasers) {
+        Position currentPosition = generateCurrentPosition(row, column);
+        Direction currentDirection = Direction.valueOf(direction);
+        Pair center = new Pair(currentPosition, currentDirection);
+        Laser laser = new Laser(currentDirection);
+        lasers.put(center, laser);
+    }
+
+    private void generateObjective(String row, String column, String direction, Map<Position, Objective> objectives) {
+        Position currentPosition = generateCurrentPosition(row, column);
+        Direction currentDirection = Direction.valueOf(direction);
+        Objective currentObjective = new Objective(currentPosition);
+        objectives.put(currentPosition, currentObjective);
+    }
+
+    public Map<Position, Block> loadBlocks(String filePath) throws IOException {
+        Map<Position, Block> blocks = new HashMap<>();
+        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            int row = 1;
+            while ((line = reader.readLine()) != null && !line.isEmpty()) {
+                int col = 1;
+                for (int i = 0; i < line.length(); i++) {
+                    generateBlock(row, col, line.charAt(i), blocks);
+                    col += 2; // Incrementar en 2 para mantener col impar
+                }
+                row += 2; // Incrementar en 2 para mantener row impar
+            }
+        }
+        return blocks;
+    }
+
     public Map<Pair, Laser> loadLasers(String filePath) throws IOException {
         Map<Pair, Laser> lasers = new HashMap<>();
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
@@ -87,12 +98,7 @@ public class FileLoader {
                     String[] parts = line.split(" ");
                     if (parts.length == 4) {
                         try {
-                            int row = Integer.parseInt(parts[2]);
-                            int col = Integer.parseInt(parts[1]);
-                            Direction direction = Direction.valueOf(parts[3]);
-                            Pair center = new Pair(new Position(row, col), direction);
-                            Laser laser = new Laser(direction);
-                            lasers.put(center, laser);
+                            generateLaser(parts[2], parts[1], parts[3], lasers);
                         } catch (IllegalArgumentException e) {
                             System.err.println("Invalid laser line: " + line);
                         }
@@ -114,11 +120,7 @@ public class FileLoader {
                     String[] parts = line.split(" ");
                     if (parts.length == 3) {
                         try {
-                            int row = Integer.parseInt(parts[2]);
-                            int col = Integer.parseInt(parts[1]);
-                            Position position = new Position(row, col);
-                            Objective objective = new Objective(position);
-                            objectives.put(position, objective);
+                            generateObjective(parts[2], parts[1], parts[3], objectives);
                         } catch (NumberFormatException e) {
                             System.err.println("Invalid objective line: " + line);
                         }

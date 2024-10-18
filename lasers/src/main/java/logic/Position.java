@@ -2,7 +2,7 @@ package logic;
 import java.util.Map;
 import java.util.Objects;
 
-import logic.blocks.Side;
+import logic.blocks.SideType;
 
 public class Position implements Comparable<Position> {
     private int row;
@@ -40,7 +40,7 @@ public class Position implements Comparable<Position> {
         return row % 2 == 0 && column % 2 != 0;
     }
 
-    public Position getBorder(Position currentPos, Side border) {
+    public Position getBorder(Position currentPos, SideType border) {
         switch (border) {
             case UPPER:
                 return new Position(currentPos.getRow() + 1, currentPos.getColumn());
