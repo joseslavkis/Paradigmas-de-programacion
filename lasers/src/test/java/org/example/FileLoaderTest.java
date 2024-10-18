@@ -9,10 +9,10 @@ import java.io.IOException;
 import java.util.Map;
 
 public class FileLoaderTest {
+    private final FileLoader fileLoader = new FileLoader();
 
     @Test
     public void testLoadBlocks() throws IOException {
-        FileLoader fileLoader = new FileLoader();
         Map<Position, Block> blocks1 = fileLoader.loadBlocks("src/test/resources/test_level.dat");
 
         // Verificar que los bloques se cargaron correctamente
@@ -31,7 +31,6 @@ public class FileLoaderTest {
 
     @Test
     public void testGetRowCount() throws IOException {
-        FileLoader fileLoader = new FileLoader();
         String filePath = "src/test/resources/level1.dat";
 
         int expectedRowCount = 6;
@@ -42,7 +41,6 @@ public class FileLoaderTest {
 
     @Test
     public void testGetColumnCount() throws IOException {
-        FileLoader fileLoader = new FileLoader();
         String filePath = "src/test/resources/level1.dat";
 
         int expectedColumnCount = 4;
@@ -53,17 +51,15 @@ public class FileLoaderTest {
 
     @Test
     public void testLoadLasers() throws IOException {
-        FileLoader fileLoader = new FileLoader();
         Map<Pair, Laser> lasers = fileLoader.loadLasers("src/test/resources/level6.dat");
 
         // Verificar que los láseres se cargaron correctamente
-        Assert.assertEquals(1, lasers.size());
-        Assert.assertEquals(Direction.SE, lasers.get(new Pair(new Position(5, 0), Direction.SE)).getDirection());
+        Assert.assertEquals(2, lasers.size());
+        Assert.assertEquals(Direction.SE, lasers.get(new Pair(new Position(3, 0), Direction.SE)).getDirection());
     }
 
     @Test
     public void testLoadObjectives() throws IOException {
-        FileLoader fileLoader = new FileLoader();
         Map<Position, Objective> objectives = fileLoader.loadObjectives("src/test/resources/test_level.dat");
 
         // Verificar que los láseres se cargaron correctamente

@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class FileLoader {
-    private Map<Character, Block> converter = Map.of(
+    private final Map<Character, Block> converter = Map.of(
         ' ', new NotBlock(),
         '.', new EmptyBlock(),
         'F', new FixedOpaqueBlock(),
@@ -67,10 +67,9 @@ public class FileLoader {
         }
     }
 
-    private void addObjective(String row, String column, String direction, Map<Position, Objective> objectives, String line) {
+    private void addObjective(String row, String column, Map<Position, Objective> objectives, String line) {
         try {
             Position currentPosition = generateCurrentPosition(row, column);
-            Direction currentDirection = Direction.valueOf(direction);
             Objective currentObjective = new Objective(currentPosition);
             objectives.put(currentPosition, currentObjective);
         } catch (NumberFormatException e) {
@@ -119,9 +118,9 @@ public class FileLoader {
             String line;
             while ((line = reader.readLine()) != null) {
                 if (line.startsWith("G")) {
-                    String[] parts = line.split(" ");
-                    if (parts.length == 3) {
-                        addObjective(parts[2], parts[1], parts[3], objectives, line);
+                    String[] separatedParts = line.split(" ");
+                    if (separatedParts.length == 3) {
+                        addObjective(separatedParts[2], separatedParts[1], objectives, line);
                     }
                 }
             }
