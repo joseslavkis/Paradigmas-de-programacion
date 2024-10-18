@@ -118,7 +118,7 @@ public class Board {
         SideType blockSideType = currentLaser.getBlockSide(currentLaserPosition);
         if (blockSideType == null) return;
 
-        Position currentBlockPosition = currentLaserPosition.getBorder(newPosition, blockSideType);
+        Position currentBlockPosition = currentLaserPosition.getBorder(newPosition, new Side(blockSideType));
         Block currentBlock = blocks.get(currentBlockPosition);
 
         if (isCurrentBlockNull(currentBlock, newPosition, newLaser, auxMap)) return;
@@ -135,4 +135,5 @@ public class Board {
         EffectApplier effectApplier = Optional.ofNullable(applierMap.get(currentBlock.getType())).orElse(new GenericEffectApplier());
         effectApplier.applyEffect(currentBlock, newLaser, newPosition, blockSideType, auxMap);
     }
+
 }

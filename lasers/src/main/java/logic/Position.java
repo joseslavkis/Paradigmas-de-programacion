@@ -2,6 +2,7 @@ package logic;
 import java.util.Map;
 import java.util.Objects;
 
+import logic.blocks.Side;
 import logic.blocks.SideType;
 
 public class Position implements Comparable<Position> {
@@ -45,19 +46,8 @@ public class Position implements Comparable<Position> {
         else return factor % 2 != 0;
     }
 
-    public Position getBorder(Position currentPos, SideType border) {
-        switch (border) {
-            case UPPER:
-                return new Position(currentPos.getRow() + 1, currentPos.getColumn());
-            case LOWER:
-                return new Position(currentPos.getRow() - 1, currentPos.getColumn());
-            case LEFT:
-                return new Position(currentPos.getRow(), currentPos.getColumn() + 1);
-            case RIGHT:
-                return new Position(currentPos.getRow(), currentPos.getColumn() - 1);
-            default:
-                throw new RuntimeException("Unknown border");
-        }
+    public Position getBorder(Position currentPos, Side border) {
+        return border.updatePosition(currentPos);
     }
 
     @Override

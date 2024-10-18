@@ -14,12 +14,10 @@ public class CrystalEffectApplier implements EffectApplier {
         this.applier = applier;
     }
 
-
     @Override
     public void applyEffect(Block currentBlock, Laser newLaser, Position newPosition, SideType blockSideType, Map<Pair, Laser> auxMap) {
         Pair pairExited = currentBlock.applyEffect(newLaser, newPosition, new Side(blockSideType));
         Laser laserExited = new Laser(pairExited.getDirection());
-//        Direction directionExited = laserExited.getDirection();
 
         Direction newDirection = applier.getCrystalDirection(blockSideType);
         newLaser.setDirection(newDirection);

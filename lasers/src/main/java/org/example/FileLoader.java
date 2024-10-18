@@ -6,6 +6,7 @@ import logic.blocks.*;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.security.InvalidParameterException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -50,7 +51,7 @@ public class FileLoader {
             Block block = converter.get(blockChar);
             Position center = new Position(row, column);
             blocks.put(center, block);
-        } catch (Exception e) {
+        } catch (InvalidParameterException e) {
             throw new IllegalArgumentException("Invalid block character: " + blockChar);
         }
     }
