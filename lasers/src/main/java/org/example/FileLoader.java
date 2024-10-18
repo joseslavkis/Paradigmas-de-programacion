@@ -42,7 +42,7 @@ public class FileLoader {
         return 0;
     }
 
-    private Block generateBlock(int row, int column, Character blockChar, Map<Position, Block> blocks) {
+    private void generateBlock(int row, int column, Character blockChar, Map<Position, Block> blocks) {
         try {
             Block block = converter.get(blockChar);
             Position center = new Position(row, column);

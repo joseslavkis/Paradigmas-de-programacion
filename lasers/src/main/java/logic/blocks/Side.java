@@ -14,7 +14,7 @@ public class Side {
         this.sideType = sideType;
     }
 
-    public Map<Direction, Direction> getPosibleDirections() {
+    public Map<Direction, Direction> getPossibleDirections() {
         Map<Direction, Direction> directionMap;
         if (sideType == SideType.LEFT) {
             directionMap = Map.of(
@@ -41,13 +41,13 @@ public class Side {
     }
 
     public Pair getUpdatedPair(Laser laser, Position position) {
-        Map<SideType, Pair> posiblePairs = Map.of(
+        Map<SideType, Pair> possiblePairs = Map.of(
                 SideType.LEFT, new Pair(new Position(position.getRow(), position.getColumn()+2), laser.getDirection()),
                 SideType.LOWER, new Pair(new Position(position.getRow() - 2, position.getColumn()), laser.getDirection()),
                 SideType.RIGHT, new Pair(new Position(position.getRow(), position.getColumn()-2), laser.getDirection()),
                 SideType.UPPER, new Pair(new Position(position.getRow() + 2, position.getColumn()), laser.getDirection())
         );
-        return posiblePairs.get(sideType);
+        return possiblePairs.get(sideType);
     }
 
 }
