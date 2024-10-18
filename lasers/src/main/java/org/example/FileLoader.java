@@ -52,7 +52,7 @@ public class FileLoader {
             Position center = new Position(row, column);
             blocks.put(center, block);
         } catch (InvalidParameterException e) {
-            throw new IllegalArgumentException("Invalid block character: " + blockChar);
+            System.err.println("Invalid block character: " + blockChar);
         }
     }
 
@@ -65,6 +65,8 @@ public class FileLoader {
             lasers.put(center, laser);
         } catch (NumberFormatException e) {
             System.err.println("Invalid laser line: " + line);
+        } catch (IllegalArgumentException e) {
+            System.err.println("Invalid direction in laser line: " + line);
         }
     }
 
@@ -94,6 +96,7 @@ public class FileLoader {
         }
         return blocks;
     }
+
 
     public Map<Pair, Laser> loadLasers(String filePath) throws IOException {
         Map<Pair, Laser> lasers = new HashMap<>();
