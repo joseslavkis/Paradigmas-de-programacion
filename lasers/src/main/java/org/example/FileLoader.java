@@ -11,7 +11,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class FileLoader {
-    private static final char SPACE = ' ';
     private Map<Character, Block> converter = Map.of(
         ' ', new NotBlock(),
         '.', new EmptyBlock(),
@@ -57,19 +56,27 @@ public class FileLoader {
         return new Position(Integer.parseInt(row), Integer.parseInt(column));
     }
 
-    private void generateLaser(String row, String column, String direction, Map<Pair, Laser> lasers) {
-        Position currentPosition = generateCurrentPosition(row, column);
-        Direction currentDirection = Direction.valueOf(direction);
-        Pair center = new Pair(currentPosition, currentDirection);
-        Laser laser = new Laser(currentDirection);
-        lasers.put(center, laser);
+    private void generateLaser(String row, String column, String direction, Map<Pair, Laser> lasers, String line) {
+        try {
+            Position currentPosition = generateCurrentPosition(row, column);
+            Direction currentDirection = Direction.valueOf(direction);
+            Pair center = new Pair(currentPosition, currentDirection);
+            Laser laser = new Laser(currentDirection);
+            lasers.put(center, laser);
+        } catch (NumberFormatException e) {
+            System.err.println("Invalid laser line: " + line);
+        }
     }
 
-    private void generateObjective(String row, String column, String direction, Map<Position, Objective> objectives) {
-        Position currentPosition = generateCurrentPosition(row, column);
-        Direction currentDirection = Direction.valueOf(direction);
-        Objective currentObjective = new Objective(currentPosition);
-        objectives.put(currentPosition, currentObjective);
+    private void generateObjective(String row, String column, String direction, Map<Position, Objective> objectives, String line) {
+        try {
+            Position currentPosition = generateCurrentPosition(row, column);
+            Direction currentDirection = Direction.valueOf(direction);
+            Objective currentObjective = new Objective(currentPosition);
+            objectives.put(currentPosition, currentObjective);
+        } catch (NumberFormatException e) {
+            System.err.println("Invalid objective line: " + line);
+        }
     }
 
     public Map<Position, Block> loadBlocks(String filePath) throws IOException {
@@ -97,11 +104,7 @@ public class FileLoader {
                 if (line.startsWith("E")) {
                     String[] parts = line.split(" ");
                     if (parts.length == 4) {
-                        try {
-                            generateLaser(parts[2], parts[1], parts[3], lasers);
-                        } catch (IllegalArgumentException e) {
-                            System.err.println("Invalid laser line: " + line);
-                        }
+                        generateLaser(parts[2], parts[1], parts[3], lasers, line);
                     } else {
                         System.err.println("Incorrect number of parts in laser line: " + line);
                     }
@@ -119,11 +122,7 @@ public class FileLoader {
                 if (line.startsWith("G")) {
                     String[] parts = line.split(" ");
                     if (parts.length == 3) {
-                        try {
-                            generateObjective(parts[2], parts[1], parts[3], objectives);
-                        } catch (NumberFormatException e) {
-                            System.err.println("Invalid objective line: " + line);
-                        }
+                        generateObjective(parts[2], parts[1], parts[3], objectives, line);
                     }
                 }
             }
