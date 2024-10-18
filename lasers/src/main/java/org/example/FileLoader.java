@@ -1,6 +1,5 @@
 package org.example;
 
-import javafx.geometry.Pos;
 import logic.*;
 import logic.blocks.*;
 
@@ -42,7 +41,11 @@ public class FileLoader {
         return 0;
     }
 
-    private void generateBlock(int row, int column, Character blockChar, Map<Position, Block> blocks) {
+    private Position generateCurrentPosition(String row, String column) {
+        return new Position(Integer.parseInt(row), Integer.parseInt(column));
+    }
+
+    private void addBlock(int row, int column, Character blockChar, Map<Position, Block> blocks) {
         try {
             Block block = converter.get(blockChar);
             Position center = new Position(row, column);
@@ -52,11 +55,7 @@ public class FileLoader {
         }
     }
 
-    private Position generateCurrentPosition(String row, String column) {
-        return new Position(Integer.parseInt(row), Integer.parseInt(column));
-    }
-
-    private void generateLaser(String row, String column, String direction, Map<Pair, Laser> lasers, String line) {
+    private void addLaser(String row, String column, String direction, Map<Pair, Laser> lasers, String line) {
         try {
             Position currentPosition = generateCurrentPosition(row, column);
             Direction currentDirection = Direction.valueOf(direction);
@@ -68,7 +67,7 @@ public class FileLoader {
         }
     }
 
-    private void generateObjective(String row, String column, String direction, Map<Position, Objective> objectives, String line) {
+    private void addObjective(String row, String column, String direction, Map<Position, Objective> objectives, String line) {
         try {
             Position currentPosition = generateCurrentPosition(row, column);
             Direction currentDirection = Direction.valueOf(direction);
@@ -87,10 +86,10 @@ public class FileLoader {
             while ((line = reader.readLine()) != null && !line.isEmpty()) {
                 int col = 1;
                 for (int i = 0; i < line.length(); i++) {
-                    generateBlock(row, col, line.charAt(i), blocks);
-                    col += 2; // Incrementar en 2 para mantener col impar
+                    addBlock(row, col, line.charAt(i), blocks);
+                    col += 2;
                 }
-                row += 2; // Incrementar en 2 para mantener row impar
+                row += 2;
             }
         }
         return blocks;
@@ -104,7 +103,7 @@ public class FileLoader {
                 if (line.startsWith("E")) {
                     String[] parts = line.split(" ");
                     if (parts.length == 4) {
-                        generateLaser(parts[2], parts[1], parts[3], lasers, line);
+                        addLaser(parts[2], parts[1], parts[3], lasers, line);
                     } else {
                         System.err.println("Incorrect number of parts in laser line: " + line);
                     }
@@ -122,7 +121,7 @@ public class FileLoader {
                 if (line.startsWith("G")) {
                     String[] parts = line.split(" ");
                     if (parts.length == 3) {
-                        generateObjective(parts[2], parts[1], parts[3], objectives, line);
+                        addObjective(parts[2], parts[1], parts[3], objectives, line);
                     }
                 }
             }

@@ -17,7 +17,7 @@ public class Laser {
     }
 
     public SideType getBlockSide(Position position) {
-        if (position.isEvenAndOdd()) {
+        if (position.checkEven("even", "odd")) {
             Map<Direction, SideType> evenAndOdd = Map.of(
                     Direction.SE, SideType.LEFT,
                     Direction.SW, SideType.RIGHT,
@@ -31,8 +31,8 @@ public class Laser {
             );
             return evenAndOdd.get(direction);
 
-        } else if (!position.isEvenAndOdd()) {
-            Map<Direction, SideType> OddAndEven = Map.of(
+        } else if (position.checkEven("odd", "even")) {
+            Map<Direction, SideType> oddAndEven = Map.of(
                     Direction.SE, SideType.UPPER,
                     Direction.SW, SideType.UPPER,
                     Direction.NE, SideType.LOWER,
@@ -42,7 +42,7 @@ public class Laser {
                     Direction.E, SideType.RIGHT,
                     Direction.W, SideType.LEFT
             );
-            return OddAndEven.get(direction);
+            return oddAndEven.get(direction);
         }
         return null;
     }
