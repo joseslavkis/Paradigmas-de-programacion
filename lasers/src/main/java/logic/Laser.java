@@ -3,7 +3,7 @@ package logic;
 import java.util.Map;
 import java.util.Objects;
 
-import logic.blocks.Side;
+import logic.blocks.SideType;
 
 public class Laser {
     private Direction direction;
@@ -16,33 +16,33 @@ public class Laser {
         this.direction = direction;
     }
 
-    public Side getBlockSide(Position position) {
-        if (position.isEvenAndOdd()) {
-            Map<Direction, Side> evenAndOdd = Map.of(
-                    Direction.SE, Side.LEFT,
-                    Direction.SW, Side.RIGHT,
-                    Direction.NE, Side.LEFT,
-                    Direction.NW, Side.RIGHT,
-                    Direction.S, Side.LOWER,
-                    Direction.N, Side.UPPER,
-                    Direction.E, Side.RIGHT,
-                    Direction.W, Side.LEFT
+    public SideType getBlockSide(Position position) {
+        if (position.checkEven("even", "odd")) {
+            Map<Direction, SideType> evenAndOdd = Map.of(
+                    Direction.SE, SideType.LEFT,
+                    Direction.SW, SideType.RIGHT,
+                    Direction.NE, SideType.LEFT,
+                    Direction.NW, SideType.RIGHT,
+                    Direction.S, SideType.LOWER,
+                    Direction.N, SideType.UPPER,
+                    Direction.E, SideType.RIGHT,
+                    Direction.W, SideType.LEFT
 
             );
             return evenAndOdd.get(direction);
 
-        } else if (!position.isEvenAndOdd()) {
-            Map<Direction, Side> OddAndEven = Map.of(
-                    Direction.SE, Side.UPPER,
-                    Direction.SW, Side.UPPER,
-                    Direction.NE, Side.LOWER,
-                    Direction.NW, Side.LOWER,
-                    Direction.S, Side.LOWER,
-                    Direction.N, Side.UPPER,
-                    Direction.E, Side.RIGHT,
-                    Direction.W, Side.LEFT
+        } else if (position.checkEven("odd", "even")) {
+            Map<Direction, SideType> oddAndEven = Map.of(
+                    Direction.SE, SideType.UPPER,
+                    Direction.SW, SideType.UPPER,
+                    Direction.NE, SideType.LOWER,
+                    Direction.NW, SideType.LOWER,
+                    Direction.S, SideType.LOWER,
+                    Direction.N, SideType.UPPER,
+                    Direction.E, SideType.RIGHT,
+                    Direction.W, SideType.LEFT
             );
-            return OddAndEven.get(direction);
+            return oddAndEven.get(direction);
         }
         return null;
     }

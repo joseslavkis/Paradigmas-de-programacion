@@ -3,10 +3,11 @@ import java.util.Map;
 import java.util.Objects;
 
 import logic.blocks.Side;
+import logic.blocks.SideType;
 
 public class Position implements Comparable<Position> {
-    private int row;
-    private int column;
+    private final int row;
+    private final int column;
 
     private static final Map<Direction, Position> movementMap = Map.of(
             Direction.SE, new Position(1, 1),
@@ -36,23 +37,17 @@ public class Position implements Comparable<Position> {
         return column;
     }
 
-    public boolean isEvenAndOdd() {
-        return row % 2 == 0 && column % 2 != 0;
+    public boolean checkEven(String rowEven, String columnEven) {
+        return checkEven(rowEven, row) && checkEven(columnEven, column);
+    }
+
+    private boolean checkEven(String even, int factor) {
+        if (even.equalsIgnoreCase("even")) return factor % 2 == 0;
+        else return factor % 2 != 0;
     }
 
     public Position getBorder(Position currentPos, Side border) {
-        switch (border) {
-            case UPPER:
-                return new Position(currentPos.getRow() + 1, currentPos.getColumn());
-            case LOWER:
-                return new Position(currentPos.getRow() - 1, currentPos.getColumn());
-            case LEFT:
-                return new Position(currentPos.getRow(), currentPos.getColumn() + 1);
-            case RIGHT:
-                return new Position(currentPos.getRow(), currentPos.getColumn() - 1);
-            default:
-                throw new RuntimeException("Unknown border");
-        }
+        return border.updatePosition(currentPos);
     }
 
     @Override

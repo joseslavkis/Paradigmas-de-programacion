@@ -91,13 +91,14 @@ public class Adapter {
             updateMainArea();
             moveLasers();
         } catch (FileNotFoundException e) {
-            showError("Unexpected error: " + e.getMessage());
+            showError("Level file not found: " + e.getMessage());
         } catch (IOException e) {
             showError("Error loading level: " + e.getMessage());
         } catch (Exception e) {
             showError("Unexpected error: " + e.getMessage());
         }
     }
+
     private String getLevelFilePath(int level) {
         return "src/main/java/org/example/levels/level" + level + ".dat";
     }
@@ -106,7 +107,6 @@ public class Adapter {
         System.err.println(message);
     }
 
-    // Adapter.java
     private void updateMainArea() {
         mainArea.getChildren().clear();
         mainArea.setAlignment(Pos.TOP_CENTER);
@@ -183,11 +183,15 @@ public class Adapter {
         String currentPathImage = imagePathMap.get(request);
         try (FileInputStream input = new FileInputStream("src/main/java/org/example/pngs/" + currentPathImage)) {
             return new Image(input);
+        } catch (FileNotFoundException e) {
+            showError("File not found: " + currentPathImage);
+            return null;
         } catch (IOException e) {
             showError("Unexpected error: " + e.getMessage());
             return null;
         }
     }
+
 
     public void moveLasers() {
         if (board != null) {
