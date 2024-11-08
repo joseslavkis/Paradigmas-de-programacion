@@ -43,9 +43,12 @@
             rest (drop 2 stack)]
            (cons (operator b a) rest)))
 
-(defn update-direction [state directions]
+(defn update-direction [state posible-direction]
       (let [stack (:stack state)
-            new-direction (if (zero? (first stack)) (first directions) (second directions))]
+            first_element (first stack)
+            new-direction (if (nil? first_element) (first posible-direction) (second posible-direction))]
+           (println first_element)
+           (println new-direction)
            (assoc state :direction new-direction :stack (rest stack))))
 
 (defn execute-command [state]
