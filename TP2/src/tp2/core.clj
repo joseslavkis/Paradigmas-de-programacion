@@ -43,13 +43,16 @@
             rest (drop 2 stack)]
            (cons (operator b a) rest)))
 
-(defn update-direction [stack directions]
-      (if (= (count stack) 0) (first directions) (second directions)))
+(defn update-direction [state directions]
+      (let [stack (:stack state)
+            new-direction (if (zero? (first stack)) (first directions) (second directions))]
+           (assoc state :direction new-direction :stack (rest stack))))
 
 (defn execute-command [state]
       (let [{:keys [toroid pc stack string-mode]} state
             [x y] pc
             command (get-in toroid [y x])]
+           (println "Stack:" stack)
            (println "Executing command:" command "at position:" pc)
            (cond
              (nil? command) (throw (Exception. "Command is nil"))
@@ -94,7 +97,7 @@
                            \v (assoc state :direction [0 1])
                            \@ (assoc state :halt true)
                            \? (assoc state :direction (rand-nth [[1 0] [-1 0] [0 1] [0 -1]]))
-                           state)))))
+                           (if (not= (int \space) (int command)) (assoc state :stack (conj stack command)) state))))))
 
 (defn run-program [state]
       (loop [current-state state]
@@ -111,7 +114,4 @@
             program (read-program file-path)
             toroid (init-toroid program)
             initial-state (init-state toroid)]
-           (println "File path:" file-path)
-           (println "Program:" program)
-           (println "Toroid:" toroid)
            (run-program initial-state)))
