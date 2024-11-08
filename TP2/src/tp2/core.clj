@@ -45,8 +45,8 @@
 
 (defn update-direction [state posible-direction]
       (let [stack (:stack state)
-            first_element (first stack)
-            new-direction (if (nil? first_element) (first posible-direction) (second posible-direction))]
+            first_element (Character/digit (first stack) 10)
+            new-direction (if (zero? first_element) (first posible-direction) (second posible-direction))]
            (println first_element)
            (println new-direction)
            (assoc state :direction new-direction :stack (rest stack))))
