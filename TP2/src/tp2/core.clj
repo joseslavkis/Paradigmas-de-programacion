@@ -47,16 +47,12 @@
       (let [stack (:stack state)
             first_element (Character/digit (first stack) 10)
             new-direction (if (zero? first_element) (first posible-direction) (second posible-direction))]
-           (println first_element)
-           (println new-direction)
            (assoc state :direction new-direction :stack (rest stack))))
 
 (defn execute-command [state]
       (let [{:keys [toroid pc stack string-mode]} state
             [x y] pc
             command (get-in toroid [y x])]
-           (println "Stack:" stack)
-           (println "Executing command:" command "at position:" pc)
            (cond
              (nil? command) (throw (Exception. "Command is nil"))
              string-mode
@@ -91,7 +87,7 @@
                (assoc state :stack (rest stack)))
 
              :else
-             (if-let [operator (function-mapping command)]
+             (if-let [operator (function-mapping [command])]
                      (assoc state :stack (operation stack operator))
                      (case command
                            \> (assoc state :direction [1 0])
