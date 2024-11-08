@@ -50,12 +50,13 @@
       (let [{:keys [toroid pc stack string-mode]} state
             [x y] pc
             command (get-in toroid [y x])]
+           (println "Executing command:" command "at position:" pc)
            (cond
+             (nil? command) (throw (Exception. "Command is nil"))
              string-mode
              (if (= command \")
                (assoc state :string-mode false)
-
-               (update state :stack (conj (int command))))
+               (update state :stack conj (int command)))
 
              (= command \")
              (assoc state :string-mode true)
@@ -72,7 +73,7 @@
                   (assoc state :stack (cons b (cons a rest))))
 
              (or (= command \_) (= command \|))
-             (update-direction (state :stack) (get-in directions [command]))
+             (update-direction state (get-in directions [command]))
 
              (= command \:)
              (let [a (first stack)]
@@ -110,4 +111,7 @@
             program (read-program file-path)
             toroid (init-toroid program)
             initial-state (init-state toroid)]
+           (println "File path:" file-path)
+           (println "Program:" program)
+           (println "Toroid:" toroid)
            (run-program initial-state)))
