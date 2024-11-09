@@ -45,10 +45,10 @@
             b-num (Character/getNumericValue b)]
            (cons (operator b-num a-num) rest)))
 
-(defn update-direction [state posible-direction]
+(defn update-direction [state possible-direction]
       (let [stack (:stack state)
             first-element (Character/digit (first stack) 10)
-            new-direction (if (zero? first-element) (first posible-direction) (second posible-direction))]
+            new-direction (if (zero? first-element) (first possible-direction) (second possible-direction))]
            (assoc state :direction new-direction :stack (rest stack))))
 
 (defn execute-command [state]
@@ -57,6 +57,7 @@
             command (get-in toroid [y x])]
            (cond
              (nil? command) (throw (Exception. "Command is nil"))
+
              string-mode
              (if (= command \")
                (assoc state :string-mode false)
@@ -67,26 +68,35 @@
 
              (= command \!)
              (let [a (first stack)
-                   rest (rest stack)]
-                  (assoc state :stack (cons (if (zero? a) 1 0) rest)))
+                   rest (rest stack)
+                   new-stack (cons (if (zero? a) 1 0) rest)]
+                  (assoc state :stack new-stack))
+
+             (= command \$)
+             (let [new-stack (rest stack)]
+                  (assoc state :stack new-stack))
 
              (= command \\)
              (let [a (first stack)
                    b (second stack)
-                   rest (drop 2 stack)]
-                  (assoc state :stack (cons b (cons a rest))))
+                   rest (drop 2 stack)
+                   new-stack (cons b (cons a rest))]
+                  (assoc state :stack new-stack))
 
              (or (= command \_) (= command \|))
-             (update-direction state (get-in directions [command]))
+             (let [new-direction (get-in directions [command])]
+                  (update-direction state new-direction))
 
              (= command \:)
-             (let [a (first stack)]
-                  (assoc state :stack (conj stack a)))
+             (let [a (first stack)
+                   new-stack (conj stack a)]
+                  (assoc state :stack new-stack))
 
              (= command \,)
              (do
                (print (char (first stack)))
-               (assoc state :stack (rest stack)))
+               (let [new-stack (rest stack)]
+                    (assoc state :stack new-stack)))
 
              :else
              (if-let [operator (function-mapping command)]
@@ -105,11 +115,10 @@
       (loop [current-state state]
             (if (:halt current-state)
               current-state
-              (do
-                (let [new-state (-> current-state
-                                    execute-command
-                                    move-pc)]
-                     (recur new-state))))))
+              (let [new-state (-> current-state
+                                  execute-command
+                                  move-pc)]
+                   (recur new-state)))))
 
 (defn -main [& args]
       (let [file-path (first args)
