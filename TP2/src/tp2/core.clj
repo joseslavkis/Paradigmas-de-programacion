@@ -40,13 +40,15 @@
 (defn operation [stack operator]
       (let [a (first stack)
             b (second stack)
-            rest (drop 2 stack)]
-           (cons (operator b a) rest)))
+            rest (drop 2 stack)
+            a-num (Character/getNumericValue a)
+            b-num (Character/getNumericValue b)]
+           (cons (operator b-num a-num) rest)))
 
 (defn update-direction [state posible-direction]
       (let [stack (:stack state)
-            first_element (Character/digit (first stack) 10)
-            new-direction (if (zero? first_element) (first posible-direction) (second posible-direction))]
+            first-element (Character/digit (first stack) 10)
+            new-direction (if (zero? first-element) (first posible-direction) (second posible-direction))]
            (assoc state :direction new-direction :stack (rest stack))))
 
 (defn execute-command [state]
@@ -87,8 +89,9 @@
                (assoc state :stack (rest stack)))
 
              :else
-             (if-let [operator (function-mapping [command])]
-                     (assoc state :stack (operation stack operator))
+             (if-let [operator (function-mapping command)]
+                     (let [new-stack (operation stack operator)]
+                          (assoc state :stack new-stack))
                      (case command
                            \> (assoc state :direction [1 0])
                            \< (assoc state :direction [-1 0])
