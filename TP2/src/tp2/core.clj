@@ -1,6 +1,18 @@
 (ns tp2.core
     (:gen-class))
 
+(defn move-pc [state]
+      (let [{:keys [pc direction toroid]} state
+            [x y] pc
+            [direction-x direction-y] direction
+            new-x (mod (+ x direction-x) 80)
+            new-y (mod (+ y direction-y) 25)]
+           (assoc state :pc [new-x new-y])))
+
+;revisar esto que parece 0 respetar principios de programación funcional
+(defn skip-next-cell [state]
+      (move-pc (move-pc state)))
+
 (defn greater [a b] (if (< a b) 1 0))
 
 (def function-mapping
@@ -29,13 +41,11 @@
        :stack '()
        :string-mode false})
 
-(defn move-pc [state]
-      (let [{:keys [pc direction toroid]} state
-            [x y] pc
-            [direction-x direction-y] direction
-            new-x (mod (+ x direction-x) 80)
-            new-y (mod (+ y direction-y) 25)]
-           (assoc state :pc [new-x new-y])))
+(defn read-integer []
+      (Integer/parseInt (read-line)))
+
+(defn read-character []
+      (int (first (read-line))))
 
 (defn operation [stack operator]
       (let [a (first stack)
@@ -83,6 +93,16 @@
                    new-stack (cons b (cons a rest))]
                   (assoc state :stack new-stack))
 
+             (= command \&)
+             (let [input (read-integer)
+                   new-stack (cons input stack)]
+                  (assoc state :stack new-stack))
+
+             (= command \~)
+             (let [input (read-character)
+                   new-stack (cons input stack)]
+                  (assoc state :stack new-stack))
+
              (or (= command \_) (= command \|))
              (let [new-direction (get-in directions [command])]
                   (update-direction state new-direction))
@@ -91,6 +111,15 @@
              (let [a (first stack)
                    new-stack (conj stack a)]
                   (assoc state :stack new-stack))
+
+             (= command \.)
+             (do
+               (print (first stack))
+               (let [new-stack (rest stack)]
+                    (assoc state :stack new-stack)))
+
+             (= command \#)
+             (skip-next-cell state)
 
              (= command \,)
              (do
