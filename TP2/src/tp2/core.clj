@@ -63,6 +63,10 @@
             new-direction (if (zero? first-element) (first possible-direction) (second possible-direction))]
            (assoc state :direction new-direction :stack (rest stack))))
 
+(defn position-conversor [a scale]
+      (if (< a scale) a (position-conversor (- a scale) scale)))
+
+
 (defn execute-command [state]
       (let [{:keys [toroid pc stack string-mode]} state
             [x y] pc
@@ -124,12 +128,17 @@
              (skip-next-cell state)
 
              (= command \g)
-             (let [y (second stack)
-                   x (first stack)
+             (let [y (position-conversor (second stack) 25)
+                   x (position-conversor (first stack) 80)
                    rest (drop 2 stack)
                    value (get-in toroid [(Integer/parseInt (str y))  (Integer/parseInt (str x))])
                    new-stack (cons value rest)]
+                  (println y)
+                  (println x)
                   (assoc state :stack new-stack))
+
+             (= command \p)
+             ()
 
              (= command \,)
              (do
