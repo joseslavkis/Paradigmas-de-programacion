@@ -116,12 +116,20 @@
 
              (= command \.)
              (do
-               (print (first stack))
+               (print (int (first stack)))
                (let [new-stack (rest stack)]
                     (assoc state :stack new-stack)))
 
              (= command \#)
              (skip-next-cell state)
+
+             (= command \g)
+             (let [y (second stack)
+                   x (first stack)
+                   rest (drop 2 stack)
+                   value (get-in toroid [(Integer/parseInt (str y))  (Integer/parseInt (str x))])
+                   new-stack (cons value rest)]
+                  (assoc state :stack new-stack))
 
              (= command \,)
              (do
