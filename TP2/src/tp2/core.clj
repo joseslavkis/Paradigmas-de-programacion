@@ -66,7 +66,6 @@
 (defn position-conversor [a scale]
       (if (< a scale) a (position-conversor (- a scale) scale)))
 
-
 (defn execute-command [state]
       (let [{:keys [toroid pc stack string-mode]} state
             [x y] pc
@@ -118,31 +117,36 @@
                    new-stack (conj stack a)]
                   (assoc state :stack new-stack))
 
-             (= command \.)
-             (do
-               (print (int (first stack)))
-               (let [new-stack (rest stack)]
-                    (assoc state :stack new-stack)))
-
              (= command \#)
              (skip-next-cell state)
 
              (= command \g)
-             (let [y (position-conversor (second stack) 25)
-                   x (position-conversor (first stack) 80)
+             (let [y (position-conversor (Integer/parseInt (str (second stack))) 25)
+                   x (position-conversor (Integer/parseInt (str (first stack))) 80)
                    rest (drop 2 stack)
-                   value (get-in toroid [(Integer/parseInt (str y))  (Integer/parseInt (str x))])
+                   value (get-in toroid [y x])
                    new-stack (cons value rest)]
-                  (println y)
-                  (println x)
                   (assoc state :stack new-stack))
 
+
              (= command \p)
-             ()
+             (let [y (position-conversor (Integer/parseInt (str (second stack))) 25)
+                   x (position-conversor (Integer/parseInt (str (first stack))) 80)
+                   value (nth stack 2)
+                   new-stack (drop 3 stack)
+                   new-toroid (assoc-in toroid [y x] value)]
+                  (assoc state :stack new-stack)
+                  (assoc state :toroid new-toroid))
 
              (= command \,)
              (do
                (print (char (first stack)))
+               (let [new-stack (rest stack)]
+                    (assoc state :stack new-stack)))
+
+             (= command \.)
+             (do
+               (print (Integer/parseInt (str (first stack))))
                (let [new-stack (rest stack)]
                     (assoc state :stack new-stack)))
 
