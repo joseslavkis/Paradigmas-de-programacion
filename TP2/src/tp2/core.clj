@@ -11,7 +11,7 @@
 
 ;revisar esto que parece 0 respetar principios de programación funcional
 (defn skip-next-cell [state]
-      (move-pc (move-pc state)))
+      (move-pc state))
 
 (defn greater [a b] (if (< a b) 1 0))
 
@@ -51,9 +51,11 @@
       (let [a (first stack)
             b (second stack)
             rest (drop 2 stack)
-            a-num (Character/getNumericValue a)
-            b-num (Character/getNumericValue b)]
-           (cons (operator b-num a-num) rest)))
+            a-num (Integer/parseInt (str a))
+            b-num (Integer/parseInt (str b))]
+           (let [result (operator b-num a-num)
+                 new-stack (cons result rest)]
+                new-stack)))
 
 (defn update-direction [state possible-direction]
       (let [stack (:stack state)
