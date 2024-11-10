@@ -132,9 +132,9 @@
              (= command \p)
              (let [y (position-conversor (Integer/parseInt (str (second stack))) 25)
                    x (position-conversor (Integer/parseInt (str (first stack))) 80)
-                   value (nth stack 2)
+                   value (Integer/parseInt (str (nth stack 2)))
                    new-stack (drop 3 stack)
-                   new-toroid (assoc-in toroid [y x] value)]
+                   new-toroid (assoc-in toroid [y x] (int value))]
                   (assoc state :stack new-stack)
                   (assoc state :toroid new-toroid))
 
@@ -146,7 +146,7 @@
 
              (= command \.)
              (do
-               (print (Integer/parseInt (str (first stack))))
+               (print (int (first stack)))
                (let [new-stack (rest stack)]
                     (assoc state :stack new-stack)))
 
