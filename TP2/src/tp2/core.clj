@@ -73,7 +73,7 @@
       (let [{:keys [toroid pc stack string-mode]} state
             [x y] pc
             command (get-in toroid [y x])]
-           (println "Posicion fila: " y " columna: " x " comando: " command, " stack: " stack)
+           ;(println "Posicion fila: " y " columna: " x " comando: " command, " stack: " stack)
            (cond
              (nil? command) (throw (Exception. "Command is nil"))
 
@@ -95,12 +95,24 @@
              (let [new-stack (rest stack)]
                   (assoc state :stack new-stack))
 
+
              (= command \\)
-             (let [a (first stack)
-                   b (second stack)
-                   rest (drop 2 stack)
-                   new-stack (cons b (cons a rest))]
-                  (assoc state :stack new-stack))
+             (cond
+               (empty? stack)
+               (let [new-stack '(0 0)]
+                    (assoc state :stack new-stack))
+
+               (= 1 (count stack))
+               (let [a (first stack)
+                     new-stack (cons 0 stack)]
+                    (assoc state :stack new-stack))
+
+               :else
+               (let [a (first stack)
+                     b (second stack)
+                     rest (drop 2 stack)
+                     new-stack (cons b (cons a rest))]
+                    (assoc state :stack new-stack)))
 
              (= command \&)
              (let [input (read-integer)
@@ -125,13 +137,17 @@
              (skip-next-cell state)
 
              (= command \g)
-             (let [y (position-conversor (Integer/parseInt (str (first stack))) 25)
-                   x (position-conversor (Integer/parseInt (str (second stack))) 80)
-                   rest (drop 2 stack)
-                   value (get-in toroid [y x])
-                   new-stack (cons value rest)]
-                  (assoc state :stack new-stack))
+             (if (or (> (Integer/parseInt (str (first stack))) 24) (> (Integer/parseInt (str (second stack))) 79))
+               (let [rest (drop 2 stack)
+                     new-stack (cons 0 rest)]
+                    (assoc state :stack new-stack))
 
+               (let [y (Integer/parseInt (str (first stack)))
+                     x (Integer/parseInt (str (second stack)))
+                     rest (drop 2 stack)
+                     value (get-in toroid [y x])
+                     new-stack (cons (int value) rest)]
+                    (assoc state :stack new-stack)))
 
              (= command \p)
              (let [y (position-conversor (Integer/parseInt (str (first stack))) 25)
@@ -149,7 +165,7 @@
 
              (= command \.)
              (do
-               (print (int (first stack)))
+               (print (Integer/parseInt (str (first stack))))
                (let [new-stack (rest stack)]
                     (assoc state :stack new-stack)))
 
