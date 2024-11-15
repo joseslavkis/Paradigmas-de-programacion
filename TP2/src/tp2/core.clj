@@ -34,6 +34,11 @@
 (defn init-toroid [program]
       (vec (concat program (repeat (- 25 (count program)) (vec (repeat 80 \space))))))
 
+(defn print-toroid [toroid]
+      (doseq [row toroid]
+             (println (apply str row))))
+
+
 (defn init-state [toroid]
       {:toroid toroid
        :pc [0 0]
@@ -53,12 +58,12 @@
             rest (drop 2 stack)
             a-num (Integer/parseInt (str a))
             b-num (Integer/parseInt (str b))
-            result (if (= operator /)
-                     (quot b-num a-num)
-                     (operator b-num a-num))
+            result (cond
+                     (= operator /) (if (zero? a-num) (throw (Exception. "Divisor cannot be zero")) (quot b-num a-num))
+                     (= operator mod) (mod b-num a-num)
+                     :else (operator b-num a-num))
             new-stack (cons result rest)]
            new-stack))
-
 
 (defn update-direction [state possible-direction]
       (let [stack (:stack state)
@@ -73,7 +78,9 @@
       (let [{:keys [toroid pc stack string-mode]} state
             [x y] pc
             command (get-in toroid [y x])]
-           ;(println "Posicion fila: " y " columna: " x " comando: " command, " stack: " stack)
+           (println "Posicion fila: " y " columna: " x " comando: " command, " stack: " stack)
+           ;(print-toroid toroid)
+
            (cond
              (nil? command) (throw (Exception. "Command is nil"))
 
@@ -154,7 +161,7 @@
                    x (position-conversor (Integer/parseInt (str (second stack))) 80)
                    value (Integer/parseInt (str (nth stack 2)))
                    new-stack (drop 3 stack)
-                   new-toroid (assoc-in toroid [y x] (int value))]
+                   new-toroid (assoc-in toroid [y x] (char value))]
                   (assoc state :stack new-stack :toroid new-toroid))
 
              (= command \,)
