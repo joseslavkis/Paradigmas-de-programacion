@@ -9,7 +9,7 @@
             new-y (mod (+ y direction-y) 25)]
            (assoc state :pc [new-x new-y])))
 
-;revisar esto que parece 0 respetar principios de programación funcional
+; revisar esto que parece 0 respetar principios de programación funcional
 (defn skip-next-cell [state]
       (move-pc state))
 
@@ -20,8 +20,7 @@
    \- -
    \* *
    \/ /
-   \% mod
-   \` greater })
+   \% mod })
 
 (def directions
   { \_ [[1 0] [-1 0]]
@@ -78,7 +77,7 @@
       (let [{:keys [toroid pc stack string-mode]} state
             [x y] pc
             command (get-in toroid [y x])]
-           (println "Posicion fila: " y " columna: " x " comando: " command, " stack: " stack)
+           ;(println "Posicion fila: " y " columna: " x " comando: " command, " stack: " stack)
            ;(print-toroid toroid)
 
            (cond
@@ -102,6 +101,12 @@
              (let [new-stack (rest stack)]
                   (assoc state :stack new-stack))
 
+             (= command \`)
+             (let [a (Integer/parseInt (str (first stack)))
+                   b (Integer/parseInt (str (second stack)))
+                   rest (drop 2 stack)
+                   new-stack (cons (greater a b) rest)]
+                  (assoc state :stack new-stack))
 
              (= command \\)
              (cond
