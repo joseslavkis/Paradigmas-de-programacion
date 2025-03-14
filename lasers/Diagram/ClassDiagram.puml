@@ -1,0 +1,140 @@
+@startuml
+
+class Position {
+    - int row
+    - int column
+}
+
+enum Direction {
+    SOUTH_EAST
+    SOUTH_WEST
+    NORTH_EAST
+    NORTH_WEST
+    NORTH
+    SOUTH
+    WEST
+    EAST
+    STATIC
+}
+
+class Board {
+    - Map<Position, Block> blocks;
+    - Map<Position, Objective> objectives;
+    - Map<Pair, Laser> lasers;
+    - Map<Pair, Laser> primitiveLasers;
+    - int row;
+    - int column;
+    -moveBlock(Position from, Position to)
+    -moveLaser(Position from, Position to)
+}
+
+enum BlockType {
+    MIRROR
+    GLASS
+    CRYSTAL
+    NOT
+    EMPTY
+    FIXED_OPAQUE
+    MOBILE_OPAQUE
+}
+
+class Objective {
+    - Position position;
+    + getPosition()
+}
+
+class Laser {
+    - Direction direction;
+    + getDirection(Direction direction)
+}
+
+class DisplacementAppiler {
+    - Map<Direction, Position> mapDisplacement
+    + Position getDisplacement(Direction direction)
+    + Position applyDisplacement(Position from, Position delta)
+}
+
+interface Block {
+    + BlockType getType()
+    + void applyEffect()
+}
+
+class Pair {
+    - Position position
+    - Direction direction
+}
+
+enum SideType {
+    LEFT
+    RIGHT
+    UPPER
+    LOWER
+}
+
+class Side {
+    -SideType sideType
+    +getUpdatedPair(Laser laser, Position position)
+    +updatePosition(Position currentPosition)
+}
+
+class GenericEffectApplier {
+}
+
+interface EffectApplier {
+  applyEffect(Block currentBlock, Laser newLaser, Position newPosition, SideType blockSideType, Map<Pair, Laser> auxMap)
+}
+
+class GlassEffectApplier {
+}
+
+class CrystalEffectApplier {
+    -applier
+}
+
+
+CrystalEffectApplier ..|> EffectApplier
+GlassEffectApplier ..|> EffectApplier
+GenericEffectApplier ..|> EffectApplier
+
+Block ..> Side
+Pair o-- Position
+Pair o-- Direction
+Board --> Pair
+Board *-- Objective
+Board *-- Laser
+Board *-- Block
+Board --> Position
+Position..> Side
+MirrorBlock ..|> Block
+CrystalBlock ..|> Block
+EmptyBlock ..|> Block
+GlassBlock ..|> Block
+MobileOpaqueBlock ..|> Block
+FixedOpaqueBlock ..|> Block
+NotBlock ..|> Block
+MirrorBlock ..> Pair
+Position <-- Laser
+Position <-- Objective
+Side o-- SideType
+Direction <-- Laser
+GlassEffectApplier ..> Side
+CrystalEffectApplier ..> Side
+GenericEffectApplier ..> Side
+Laser --> Block
+Block ..> BlockType
+MirrorBlock --> DisplacementAppiler
+CrystalBlock --> DisplacementAppiler
+EmptyBlock --> DisplacementAppiler
+GlassBlock --> DisplacementAppiler
+MobileOpaqueBlock --> DisplacementAppiler
+FixedOpaqueBlock --> DisplacementAppiler
+NotBlock --> DisplacementAppiler
+Block ..> Laser
+Laser ..> SideType
+Board ..> SideType
+Block ..> SideType
+DisplacementAppiler ..> SideType
+DisplacementAppiler --> Position
+DisplacementAppiler --> Direction
+
+@enduml
